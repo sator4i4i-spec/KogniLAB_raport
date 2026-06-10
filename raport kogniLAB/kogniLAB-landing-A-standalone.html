@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>kogniLAB · FOMO / EEG — Raport (wariant A)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --umk-blue:#034EA1;
+  --umk-blue-deep:#022f63;
+  --umk-blue-700:#063e7d;
+  --gold:#FFCD00;
+  --gold-deep:#e0a900;
+  --ink:#13233b;
+  --ink-soft:#43566f;
+  --paper:#ffffff;
+  --paper-2:#f4f7fb;
+  --paper-3:#eaf0f8;
+  --line:#d9e2ee;
+  --serif:"Source Serif 4",Georgia,serif;
+  --sans:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --maxw:1180px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--paper);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.55;
+}
+.lang-en{display:none}
+html[data-lang="en"] .lang-pl{display:none}
+html[data-lang="en"] .lang-en{display:revert}
+a{color:inherit;text-decoration:none}
+
+/* ---------- NAV ---------- */
+.nav{
+  position:sticky;top:0;z-index:40;
+  background:rgba(255,255,255,.86);
+  backdrop-filter:saturate(140%) blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav__inner{
+  max-width:var(--maxw);margin:0 auto;
+  display:flex;align-items:center;gap:22px;
+  padding:13px 28px;
+}
+.brand{display:flex;align-items:center;gap:11px;flex-shrink:0}
+.brand__mark{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--umk-blue);position:relative;flex-shrink:0;
+  display:grid;place-items:center;
+}
+.brand__mark::after{content:"";width:11px;height:11px;border-radius:50%;background:var(--gold)}
+.brand__mark::before{content:"";position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);width:7px;height:7px;border-radius:50%;background:var(--umk-blue);border:2px solid #fff}
+.brand__txt{display:flex;flex-direction:column;line-height:1}
+.brand__name{font-weight:700;font-size:15px;letter-spacing:-.01em}
+.brand__name b{color:var(--umk-blue)}
+.brand__sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--ink-soft);text-transform:uppercase;margin-top:3px}
+.nav__links{
+  display:flex;align-items:center;gap:1px;flex:1;
+  overflow-x:auto;scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent);
+}
+.nav__links::-webkit-scrollbar{display:none}
+.nav__link{
+  display:flex;align-items:center;gap:6px;white-space:nowrap;
+  font-size:12.5px;font-weight:500;color:var(--ink-soft);
+  padding:7px 10px;border-radius:7px;transition:.16s;
+}
+.nav__link:hover{color:var(--umk-blue);background:var(--paper-2)}
+.nav__link.is-active{color:var(--umk-blue);background:var(--paper-3)}
+.nav__link i{font-family:var(--mono);font-size:10.5px;font-style:normal;color:var(--gold-deep);font-weight:600}
+.nav__tools{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.langtog{
+  display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;font-family:var(--mono);
+}
+.langtog button{
+  font-family:inherit;font-size:11.5px;font-weight:600;letter-spacing:.04em;
+  padding:6px 11px;background:#fff;border:none;color:var(--ink-soft);cursor:pointer;transition:.15s;
+}
+.langtog button[aria-pressed="true"]{background:var(--umk-blue);color:#fff}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+#eeg{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0}
+.hero__fade{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.32) 55%,rgba(255,255,255,.9) 100%)}
+.hero__inner{position:relative;z-index:2;max-width:var(--maxw);margin:0 auto;padding:74px 28px 60px}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:12px;font-family:var(--mono);
+  font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--umk-blue);
+  background:#fff;border:1px solid var(--line);border-radius:100px;padding:8px 15px;
+  box-shadow:0 1px 0 rgba(3,78,161,.04);
+}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px rgba(255,205,0,.25)}
+.discipline-tag{color:var(--ink-soft)}
+h1.title{
+  font-family:var(--serif);font-weight:600;letter-spacing:-.018em;
+  font-size:clamp(34px,5.4vw,62px);line-height:1.03;margin:26px 0 0;
+  max-width:17ch;color:var(--ink);text-wrap:balance;
+}
+h1.title .accent{color:var(--umk-blue)}
+h1.title .fomo{position:relative;white-space:nowrap}
+h1.title .fomo::after{content:"";position:absolute;left:0;right:0;bottom:.08em;height:.18em;background:var(--gold);z-index:-1;opacity:.85}
+.subtitle{
+  font-family:var(--serif);font-size:clamp(18px,2.1vw,23px);line-height:1.5;
+  color:var(--ink-soft);max-width:46ch;margin:22px 0 0;font-weight:400;
+}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin-top:30px}
+.meta__item{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--ink)}
+.meta__item .k{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.meta__item .v{font-weight:600}
+.meta__sep{width:1px;height:18px;background:var(--line)}
+
+/* hook */
+.hook{
+  display:grid;grid-template-columns:auto 1fr;align-items:center;gap:40px;
+  margin-top:46px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:18px;
+  padding:30px 36px;box-shadow:0 18px 44px -28px rgba(3,78,161,.35);max-width:780px;
+  position:relative;overflow:hidden;backdrop-filter:blur(2px);
+}
+.hook::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--gold)}
+.hook__num{
+  font-family:var(--serif);font-weight:700;line-height:.85;
+  font-size:clamp(72px,11vw,112px);letter-spacing:-.03em;
+  color:var(--umk-blue);display:flex;align-items:flex-start;padding-right:6px;
+}
+.hook__num sup{font-size:.42em;font-weight:600;margin-top:.32em;color:var(--gold-deep)}
+.hook__body p{font-size:16px;line-height:1.5;color:var(--ink);max-width:38ch}
+.hook__body .src{display:block;margin-top:11px;font-family:var(--mono);font-size:11px;color:var(--ink-soft);letter-spacing:.02em}
+.hook__pulse{position:absolute;right:-40px;bottom:-40px;width:180px;height:180px;border-radius:50%;
+  background:radial-gradient(circle,rgba(3,78,161,.07),transparent 68%);pointer-events:none}
+
+.scrollcue{display:flex;align-items:center;gap:10px;margin-top:40px;font-family:var(--mono);
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+.scrollcue .line{width:46px;height:1px;background:var(--ink-soft);position:relative;overflow:hidden}
+.scrollcue .line::after{content:"";position:absolute;inset:0;width:40%;background:var(--gold-deep);animation:slide 1.9s ease-in-out infinite}
+@keyframes slide{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
+
+/* ---------- ABSTRACT ---------- */
+.abstract{max-width:var(--maxw);margin:0 auto;padding:66px 28px 86px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:30px}
+.sec-head .no{font-family:var(--mono);font-size:13px;color:var(--gold-deep);font-weight:600}
+.sec-head h2{font-family:var(--serif);font-weight:600;font-size:clamp(24px,3vw,32px);letter-spacing:-.01em}
+.sec-head .rule{flex:1;height:1px;background:var(--line)}
+.abs-grid{display:grid;grid-template-columns:1.05fr 1.35fr;gap:46px;align-items:start}
+@media(max-width:880px){.abs-grid{grid-template-columns:1fr;gap:30px}}
+.tldr__label{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--umk-blue);margin-bottom:16px;display:flex;align-items:center;gap:9px}
+.tldr__label::before{content:"";width:22px;height:2px;background:var(--gold)}
+.tldr{display:flex;flex-direction:column;gap:14px}
+.tldr__item{display:grid;grid-template-columns:auto 1fr;gap:15px;align-items:start;
+  background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:17px 19px}
+.tldr__ico{width:34px;height:34px;border-radius:9px;background:#fff;border:1px solid var(--line);
+  display:grid;place-items:center;color:var(--umk-blue);flex-shrink:0}
+.tldr__ico svg{width:18px;height:18px}
+.tldr__item h3{font-size:13.5px;font-weight:700;margin-bottom:3px;letter-spacing:.01em}
+.tldr__item p{font-size:13.5px;color:var(--ink-soft);line-height:1.45}
+.tldr__item .em{color:var(--umk-blue);font-weight:600}
+
+.abs-full{font-family:var(--serif)}
+.abs-full__lead{font-size:19px;line-height:1.62;color:var(--ink);font-weight:500}
+.abs-full__lead b{color:var(--umk-blue)}
+.abs-more{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.4,0,.2,1)}
+.abs-more__inner{padding-top:18px}
+.abs-full p{font-size:16px;line-height:1.66;color:var(--ink-soft);margin-top:15px}
+.abs-toggle{
+  margin-top:20px;display:inline-flex;align-items:center;gap:10px;font-family:var(--sans);
+  font-size:13.5px;font-weight:600;color:var(--umk-blue);background:#fff;
+  border:1px solid var(--line);border-radius:100px;padding:9px 17px;cursor:pointer;transition:.18s;
+}
+.abs-toggle:hover{background:var(--paper-2);border-color:#bcd0e8}
+.abs-toggle .chev{transition:transform .35s;display:grid;place-items:center}
+.abs-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.abs-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.abs-tag{font-family:var(--mono);font-size:11px;color:var(--ink-soft);border:1px solid var(--line);
+  border-radius:7px;padding:5px 10px;background:#fff}
+.abs-tag b{color:var(--umk-blue)}
+
+footer.mini{max-width:var(--maxw);margin:0 auto;padding:24px 28px 50px;border-top:1px solid var(--line);
+  display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;
+  font-family:var(--mono);font-size:11px;color:var(--ink-soft);letter-spacing:.03em}
+</style>
+</head>
+<body data-variant="a">
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav__inner">
+    <a class="brand" href="#01-landing" aria-label="kogniLAB">
+      <span class="brand__mark"></span>
+      <span class="brand__txt">
+        <span class="brand__name">kogni<b>LAB</b></span>
+        <span class="brand__sub">UMK&nbsp;×&nbsp;UW · EEG</span>
+      </span>
+    </a>
+    <div class="nav__links" id="navLinks">
+      <a class="nav__link" href="#01-landing"><i>01</i><span class="lang-pl">Start</span><span class="lang-en">Start</span></a>
+      <a class="nav__link" href="#02-wprowadzenie"><i>02</i><span class="lang-pl">Wprowadzenie</span><span class="lang-en">Introduction</span></a>
+      <a class="nav__link" href="#03-cel-i-hipotezy"><i>03</i><span class="lang-pl">Cel i hipotezy</span><span class="lang-en">Aim &amp; hypotheses</span></a>
+      <a class="nav__link" href="#04-metodologia"><i>04</i><span class="lang-pl">Metodologia</span><span class="lang-en">Methods</span></a>
+      <a class="nav__link" href="#05-wyniki"><i>05</i><span class="lang-pl">Wyniki</span><span class="lang-en">Results</span></a>
+      <a class="nav__link" href="#06-budzet"><i>06</i><span class="lang-pl">Budżet</span><span class="lang-en">Budget</span></a>
+      <a class="nav__link" href="#07-zespol"><i>07</i><span class="lang-pl">Zespół</span><span class="lang-en">Team</span></a>
+      <a class="nav__link" href="#08-harmonogram"><i>08</i><span class="lang-pl">Harmonogram</span><span class="lang-en">Timeline</span></a>
+      <a class="nav__link" href="#09-glossary"><i>09</i><span class="lang-pl">Słownik</span><span class="lang-en">Glossary</span></a>
+      <a class="nav__link" href="#10-bibliografia"><i>10</i><span class="lang-pl">Bibliografia</span><span class="lang-en">References</span></a>
+      <a class="nav__link" href="#11-tworzenie-raportu"><i>11</i><span class="lang-pl">O raporcie</span><span class="lang-en">About</span></a>
+    </div>
+    <div class="nav__tools">
+      <div class="langtog" role="group" aria-label="Język / Language">
+        <button data-lang="pl" aria-pressed="true">PL</button>
+        <button data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="01-landing" data-screen-label="01 Landing">
+  <canvas id="eeg"></canvas>
+  <div class="hero__fade"></div>
+  <div class="hero__inner">
+    <span class="eyebrow">
+      <span class="dot"></span>
+      <span class="lang-pl">Projekt badawczy · Kognitywistyka</span><span class="lang-en">Research project · Cognitive Science</span>
+      <span class="discipline-tag">· 2025/2026</span>
+    </span>
+
+    <h1 class="title">
+      <span class="lang-pl">Neuronalne i behawioralne korelaty <span class="fomo">FOMO</span></span>
+      <span class="lang-en">Neural &amp; behavioral correlates of <span class="fomo">FOMO</span></span>
+    </h1>
+
+    <p class="subtitle">
+      <span class="lang-pl">Badanie EEG mierzące reakcję mózgu na dźwięki powiadomień u osób o wysokim i niskim lęku przed pominięciem — gdy telefon jest poza zasięgiem.</span>
+      <span class="lang-en">An EEG study measuring the brain's response to notification sounds in people with high vs. low fear of missing out — when the phone is out of reach.</span>
+    </p>
+
+    <div class="meta">
+      <span class="meta__item"><span class="k">Autor</span><span class="v">D. Satora-Izquierdo</span></span>
+      <span class="meta__sep"></span>
+      <span class="meta__item"><span class="k">Dyscyplina</span><span class="v"><span class="lang-pl">Kognitywistyka</span><span class="lang-en">Cognitive Science</span></span></span>
+      <span class="meta__sep"></span>
+      <span class="meta__item"><span class="k"><span class="lang-pl">Ośrodki</span><span class="lang-en">Institutions</span></span><span class="v">UMK · UW</span></span>
+      <span class="meta__sep"></span>
+      <span class="meta__item"><span class="k"><span class="lang-pl">Metoda</span><span class="lang-en">Method</span></span><span class="v">EEG 64‑ch · P300 · FAA</span></span>
+    </div>
+
+    <div class="hook">
+      <div class="hook__num">69<sup>%</sup></div>
+      <div class="hook__body">
+        <p>
+          <span class="lang-pl">młodych użytkowników mediów społecznościowych w USA doświadcza <b>FOMO</b> — lęku przed pominięciem. To już nie niszowy problem, lecz powszechny mechanizm kognitywny.</span>
+          <span class="lang-en">of young social-media users in the US experience <b>FOMO</b> — the fear of missing out. No longer a niche issue, but a widespread cognitive mechanism.</span>
+        </p>
+        <span class="src">Bartosiak i in., 2025 · PLOS ONE</span>
+      </div>
+      <div class="hook__pulse"></div>
+    </div>
+
+    <div class="scrollcue">
+      <span class="line"></span>
+      <span class="lang-pl">Przewiń do streszczenia</span><span class="lang-en">Scroll to summary</span>
+    </div>
+  </div>
+</header>
+
+<!-- ABSTRACT -->
+<section class="abstract" id="abstract" aria-label="Streszczenie">
+  <div class="sec-head">
+    <span class="no">00</span>
+    <h2><span class="lang-pl">Streszczenie</span><span class="lang-en">Abstract</span></h2>
+    <span class="rule"></span>
+  </div>
+
+  <div class="abs-grid">
+    <!-- TL;DR -->
+    <div class="tldr-col">
+      <div class="tldr__label"><span class="lang-pl">W 15 sekund</span><span class="lang-en">In 15 seconds</span></div>
+      <div class="tldr">
+        <div class="tldr__item">
+          <span class="tldr__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.3-4.3"/></svg></span>
+          <div>
+            <h3><span class="lang-pl">Pytanie</span><span class="lang-en">Question</span></h3>
+            <p><span class="lang-pl">Jak mózg reaguje na <span class="em">dźwięk powiadomienia</span>, gdy nie wolno sprawdzić telefonu?</span><span class="lang-en">How does the brain react to a <span class="em">notification sound</span> when checking the phone is forbidden?</span></p>
+          </div>
+        </div>
+        <div class="tldr__item">
+          <span class="tldr__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h3l2-7 4 14 2-7h7"/></svg></span>
+          <div>
+            <h3><span class="lang-pl">Metoda</span><span class="lang-en">Method</span></h3>
+            <p><span class="lang-pl">EEG 64‑kanałowy, <span class="em">N = 40</span> (wysokie vs niskie FOMO). Wskaźniki: fala P300 i asymetria czołowa alfa.</span><span class="lang-en">64-channel EEG, <span class="em">N = 40</span> (high vs low FOMO). Markers: P300 wave and frontal alpha asymmetry.</span></p>
+          </div>
+        </div>
+        <div class="tldr__item">
+          <span class="tldr__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v3M12 18v3M5 12H2M22 12h-3M6 6l-2-2M20 20l-2-2M18 6l2-2M4 20l2-2"/><circle cx="12" cy="12" r="3.4"/></svg></span>
+          <div>
+            <h3><span class="lang-pl">Hipoteza</span><span class="lang-en">Hypothesis</span></h3>
+            <p><span class="lang-pl">Wysokie FOMO = <span class="em">silniejsza i nieustępująca</span> reakcja mózgu: większa P300 i spadek mocy alfa po lewej stronie.</span><span class="lang-en">High FOMO = a <span class="em">stronger, non-habituating</span> brain response: larger P300 and a drop in left-frontal alpha power.</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FULL ABSTRACT -->
+    <div class="abs-full">
+      <p class="abs-full__lead">
+        <span class="lang-pl">Lęk przed pominięciem (FOMO) stał się powszechnym zjawiskiem kognitywnym i społecznym. Dotychczasowe badania opierały się głównie na kwestionariuszach — ten projekt wykorzystuje <b>EEG o rozdzielczości milisekundowej</b>, by obiektywnie zmierzyć reakcję mózgu na dźwiękowe powiadomienia.</span>
+        <span class="lang-en">The fear of missing out (FOMO) has become a widespread cognitive and social phenomenon. Prior research relied mostly on questionnaires — this project uses <b>millisecond-resolution EEG</b> to objectively measure the brain's response to notification sounds.</span>
+      </p>
+
+      <div class="abs-more" id="absMore" aria-hidden="true">
+        <div class="abs-more__inner">
+          <p><span class="lang-pl">W badaniu weźmie udział 40 osób w wieku 18–25 lat, wyłonionych metodą doboru skrajnego: 20 osób o wysokim i 20 o niskim poziomie FOMO. Podczas zadania ciągłego wykonania (CPT) rejestrowany jest 64‑kanałowy sygnał EEG, a w tle losowo emitowane są trzy typy bodźców: kluczowy (indywidualny dźwięk powiadomienia uczestnika), neutralny i kontrolny. Przez cały czas uczestnik nie może dotknąć telefonu.</span>
+          <span class="lang-en">Forty participants aged 18–25 are selected by extreme-groups sampling: 20 with high and 20 with low FOMO. During a continuous performance task (CPT), 64-channel EEG is recorded while three sound types are played at random in the background: key (the participant's own notification sound), neutral and control. Throughout, the participant cannot touch the phone.</span></p>
+
+          <p><span class="lang-pl">Analizie poddane zostaną dwa wskaźniki: amplituda fali <b>P300</b> (odpowiedź orientacyjna na dystraktor) oraz <b>asymetria czołowa alfa (FAA)</b> jako marker pobudzenia i gotowości do działania. Oczekujemy, że osoby o wysokim FOMO wykażą silniejszy spadek mocy alfa w lewej korze czołowej oraz wyższą amplitudę i brak habituacji fali P300 — co wskazywałoby na utrzymujący się stan pobudzenia i frustracji.</span>
+          <span class="lang-en">Two markers are analysed: <b>P300</b> amplitude (an orienting response to the distractor) and <b>frontal alpha asymmetry (FAA)</b> as a marker of arousal and action readiness. We expect high-FOMO individuals to show a stronger drop in left-frontal alpha power and a larger, non-habituating P300 — indicating a sustained state of arousal and frustration.</span></p>
+
+          <p><span class="lang-pl">Wyniki pozwolą lepiej zrozumieć neurobiologiczne podłoże kompulsywnego sięgania po telefon i mogą stać się podstawą interwencji ograniczających negatywne skutki FOMO.</span>
+          <span class="lang-en">The findings will deepen our understanding of the neurobiology behind compulsive phone-checking and may inform interventions that mitigate the negative effects of FOMO.</span></p>
+        </div>
+      </div>
+
+      <button class="abs-toggle" id="absToggle" aria-expanded="false" aria-controls="absMore">
+        <span class="abs-toggle__txt"><span class="lang-pl">Czytaj pełny abstrakt</span><span class="lang-en">Read full abstract</span></span>
+        <span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+
+      <div class="abs-tags">
+        <span class="abs-tag">FOMO</span>
+        <span class="abs-tag">EEG · 64‑ch</span>
+        <span class="abs-tag"><b>P300</b></span>
+        <span class="abs-tag">Frontal Alpha Asymmetry</span>
+        <span class="abs-tag">CPT</span>
+        <span class="abs-tag">N = 40</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="mini">
+  <span>kogniLAB · UMK × UW · 2025/2026</span>
+  <span class="lang-pl">Wariant A — jasny akademicki · sekcja: landing</span>
+  <span class="lang-en">Variant A — light academic · section: landing</span>
+</footer>
+
+<script>
+/* Continuous multi-channel EEG background — kogniLAB
+   Reads theme colors from CSS vars; adapts to light/dark via data-variant. */
+(function () {
+  const canvas = document.getElementById('eeg');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const host = canvas.parentElement;
+  const cs = getComputedStyle(document.body);
+  const variant = document.body.getAttribute('data-variant') || 'a';
+  const dark = variant === 'b';
+
+  const blue = (cs.getPropertyValue('--umk-blue') || '#034EA1').trim();
+  const gold = (cs.getPropertyValue('--gold') || '#FFCD00').trim();
+  const lineCol = dark ? 'rgba(160,202,255,0.42)' : 'rgba(3,78,161,0.30)';
+  const lineColFaint = dark ? 'rgba(160,202,255,0.22)' : 'rgba(3,78,161,0.16)';
+  const accent = gold;
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  // channel definitions: label position fraction, amplitude, base freq, phase, speed, accent?
+  const CH = [
+    { y: 0.14, amp: 13, f: 0.9, ph: 0.0, sp: 1.05, acc: false },
+    { y: 0.27, amp: 18, f: 1.3, ph: 1.7, sp: 0.85, acc: false },
+    { y: 0.40, amp: 15, f: 1.05, ph: 3.1, sp: 1.25, acc: false },
+    { y: 0.53, amp: 22, f: 0.75, ph: 0.6, sp: 0.7, acc: true },   // accent (key stimulus channel, with P300 bumps)
+    { y: 0.66, amp: 16, f: 1.5, ph: 2.2, sp: 1.0, acc: false },
+    { y: 0.79, amp: 19, f: 1.0, ph: 4.0, sp: 0.9, acc: false },
+    { y: 0.91, amp: 12, f: 1.7, ph: 1.1, sp: 1.15, acc: false },
+  ];
+
+  function resize() {
+    const r = host.getBoundingClientRect();
+    W = Math.max(320, r.width); H = Math.max(360, r.height);
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  // pseudo-random but smooth noise via layered sines
+  function eegVal(x, t, ch) {
+    const k = x * 0.012;
+    let v = 0;
+    v += Math.sin(k * ch.f + t * ch.sp + ch.ph) * 0.55;
+    v += Math.sin(k * ch.f * 2.3 + t * ch.sp * 1.6 + ch.ph * 1.7) * 0.28;
+    v += Math.sin(k * ch.f * 4.7 + t * ch.sp * 0.6) * 0.13;
+    v += Math.sin(k * 11.0 + t * 3.0 + ch.ph) * 0.06; // fast beta ripple
+    // periodic P300-like evoked bump on accent channel
+    if (ch.acc) {
+      const period = 4.6;
+      const local = ((t * ch.sp + x * 0.0009) % period + period) % period;
+      const center = 1.4;
+      const d = local - center;
+      v += Math.exp(-(d * d) / 0.06) * 1.5; // sharp positive deflection
+    }
+    return v * ch.amp;
+  }
+
+  let t0 = performance.now();
+  function frame(now) {
+    const t = reduce ? 2.0 : (now - t0) / 1000;
+    ctx.clearRect(0, 0, W, H);
+
+    const step = 4;
+    for (let ci = 0; ci < CH.length; ci++) {
+      const ch = CH[ci];
+      const baseY = H * ch.y;
+      ctx.beginPath();
+      for (let x = -2; x <= W + 2; x += step) {
+        const y = baseY - eegVal(x, t, ch);
+        if (x === -2) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      if (ch.acc) {
+        ctx.strokeStyle = accent;
+        ctx.globalAlpha = dark ? 0.85 : 0.7;
+        ctx.lineWidth = 1.7;
+        ctx.shadowColor = accent;
+        ctx.shadowBlur = dark ? 8 : 0;
+      } else {
+        ctx.strokeStyle = ci % 2 ? lineColFaint : lineCol;
+        ctx.globalAlpha = 1;
+        ctx.lineWidth = 1.3;
+        ctx.shadowBlur = 0;
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+    }
+
+    // moving scan playhead
+    if (!reduce) {
+      const px = ((t * 70) % (W + 120)) - 60;
+      const grad = ctx.createLinearGradient(px - 50, 0, px + 10, 0);
+      grad.addColorStop(0, 'rgba(255,205,0,0)');
+      grad.addColorStop(1, dark ? 'rgba(255,205,0,0.18)' : 'rgba(255,205,0,0.13)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(px - 50, 0, 60, H);
+      ctx.strokeStyle = dark ? 'rgba(255,205,0,0.45)' : 'rgba(224,169,0,0.4)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, H); ctx.stroke();
+    }
+
+    if (!reduce) requestAnimationFrame(frame);
+  }
+
+  resize();
+  requestAnimationFrame(frame);
+  let rT;
+  window.addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(() => { resize(); if (reduce) requestAnimationFrame(frame); }, 120); });
+})();
+
+</script>
+<script>
+/* kogniLAB — language toggle, abstract expand, scrollspy */
+(function () {
+  const root = document.documentElement;
+
+  /* ---- Language PL/EN (persisted) ---- */
+  const KEY = 'kognilab-lang';
+  const saved = localStorage.getItem(KEY);
+  if (saved === 'en' || saved === 'pl') setLang(saved, false);
+
+  function setLang(lang, store = true) {
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('lang', lang);
+    document.querySelectorAll('.langtog button').forEach(b => {
+      b.setAttribute('aria-pressed', String(b.dataset.lang === lang));
+    });
+    if (store) localStorage.setItem(KEY, lang);
+  }
+  document.querySelectorAll('.langtog button').forEach(b => {
+    b.addEventListener('click', () => setLang(b.dataset.lang));
+  });
+
+  /* ---- Abstract expand/collapse ---- */
+  const toggle = document.getElementById('absToggle');
+  const more = document.getElementById('absMore');
+  if (toggle && more) {
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!open));
+      more.setAttribute('aria-hidden', String(open));
+      more.style.maxHeight = open ? '0px' : more.scrollHeight + 'px';
+      const txt = toggle.querySelector('.abs-toggle__txt');
+      if (txt) {
+        const pl = open ? 'Czytaj pełny abstrakt' : 'Zwiń abstrakt';
+        const en = open ? 'Read full abstract' : 'Collapse abstract';
+        txt.innerHTML = `<span class="lang-pl">${pl}</span><span class="lang-en">${en}</span>`;
+      }
+    });
+    // keep height correct on resize when open
+    window.addEventListener('resize', () => {
+      if (toggle.getAttribute('aria-expanded') === 'true') more.style.maxHeight = more.scrollHeight + 'px';
+    });
+  }
+
+  /* ---- Scrollspy for nav (only sections present on page) ---- */
+  const links = [...document.querySelectorAll('.nav__link')];
+  const map = new Map();
+  links.forEach(l => {
+    const id = l.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) map.set(el, l);
+  });
+  if (map.size) {
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          links.forEach(l => l.classList.remove('is-active'));
+          map.get(e.target)?.classList.add('is-active');
+        }
+      });
+    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+    map.forEach((_, el) => io.observe(el));
+  }
+})();
+
+/* =====================================================================
+   EDIT MODE — pencil toggle, inline editing, autosave, export, reset
+   ===================================================================== */
+(function () {
+  const root = document.documentElement;
+  const variant = document.body.getAttribute('data-variant') || 'a';
+  const NS = 'kognilab-edit:' + variant + ':';
+
+  /* ---- which text is editable ---- */
+  const SEL = [
+    '.eyebrow', '.discipline-tag', 'h1.title', '.subtitle',
+    '.meta__item .v', '.hook__num', '.hook__body p', '.hook__body .src',
+    '.sec-head h2', '.tldr__label', '.tldr__item h3', '.tldr__item p',
+    '.abs-full__lead', '.abs-more p', '.abs-tag'
+  ];
+
+  const items = []; // {el, key}
+  function register(el, key) {
+    if (el.dataset.ek) return;            // avoid double-register
+    el.dataset.ek = key;
+    const saved = localStorage.getItem(NS + key);
+    if (saved != null) el.innerHTML = saved;   // restore baked/saved text
+    el.addEventListener('input', () => {
+      localStorage.setItem(NS + key, el.innerHTML);
+    });
+    items.push({ el, key });
+  }
+  function consider(el, baseKey) {
+    const langs = el.querySelectorAll(':scope > .lang-pl, :scope > .lang-en');
+    if (langs.length) {
+      langs.forEach(s => register(s, baseKey + '_' + (s.classList.contains('lang-pl') ? 'pl' : 'en')));
+    } else {
+      register(el, baseKey);
+    }
+  }
+  SEL.forEach((sel, si) => {
+    document.querySelectorAll(sel).forEach((el, i) => consider(el, si + '-' + i));
+  });
+
+  /* ---- styles for edit mode ---- */
+  const style = document.createElement('style');
+  style.setAttribute('data-edit-ui', '');
+  style.textContent = `
+    html.editing [data-ek]{outline:1px dashed rgba(3,78,161,.45);outline-offset:3px;border-radius:3px;cursor:text;transition:background .15s,outline-color .15s}
+    html.editing [data-ek]:hover{outline-color:rgba(3,78,161,.9);background:rgba(255,205,0,.10)}
+    html.editing [data-ek]:focus{outline:2px solid #034EA1;background:rgba(255,205,0,.16)}
+    body[data-variant="b"] html.editing [data-ek],
+    html.editing body[data-variant="b"] [data-ek]{outline-color:rgba(255,205,0,.5)}
+    .ed-fab{position:fixed;right:22px;bottom:22px;z-index:9999;display:flex;flex-direction:column;align-items:flex-end;gap:10px;font-family:"IBM Plex Sans",system-ui,sans-serif}
+    .ed-btn{display:flex;align-items:center;gap:9px;border:none;cursor:pointer;border-radius:100px;
+      font-family:inherit;font-size:13px;font-weight:600;padding:11px 16px;box-shadow:0 10px 30px -10px rgba(3,30,70,.55);transition:.16s;color:#fff;background:#034EA1}
+    .ed-btn:hover{transform:translateY(-1px);box-shadow:0 14px 34px -10px rgba(3,30,70,.6)}
+    .ed-btn svg{width:17px;height:17px}
+    .ed-btn.is-on{background:#1f8a5b}
+    .ed-panel{display:none;flex-direction:column;gap:4px;background:#fff;border:1px solid #d9e2ee;border-radius:14px;padding:8px;box-shadow:0 18px 50px -16px rgba(3,30,70,.45);min-width:208px}
+    .ed-panel.open{display:flex}
+    .ed-panel__hint{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.04em;color:#64748b;padding:6px 10px 8px;line-height:1.5}
+    .ed-act{display:flex;align-items:center;gap:10px;background:none;border:none;cursor:pointer;width:100%;text-align:left;
+      font-family:inherit;font-size:13px;font-weight:500;color:#13233b;padding:9px 11px;border-radius:9px;transition:.13s}
+    .ed-act:hover{background:#f1f5fb}
+    .ed-act svg{width:16px;height:16px;color:#034EA1;flex-shrink:0}
+    .ed-act.danger{color:#b4321f}.ed-act.danger svg{color:#b4321f}
+    @media print{.ed-fab{display:none}}
+  `;
+  document.head.appendChild(style);
+
+  /* ---- floating control ---- */
+  const isPL = () => (root.getAttribute('data-lang') || 'pl') !== 'en';
+  const fab = document.createElement('div');
+  fab.className = 'ed-fab';
+  fab.setAttribute('data-edit-ui', '');
+  fab.innerHTML = `
+    <div class="ed-panel" id="edPanel">
+      <button class="ed-act" data-act="download">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>
+        <span class="ed-lbl-download"></span>
+      </button>
+      <button class="ed-act danger" data-act="reset">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg>
+        <span class="ed-lbl-reset"></span>
+      </button>
+      <div class="ed-panel__hint ed-hint"></div>
+    </div>
+    <button class="ed-btn" id="edToggle" aria-pressed="false">
+      <svg class="ic-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+      <svg class="ic-done" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" style="display:none"><path d="M20 6 9 17l-5-5"/></svg>
+      <span class="ed-lbl-toggle"></span>
+    </button>`;
+  document.body.appendChild(fab);
+
+  const toggleBtn = fab.querySelector('#edToggle');
+  const panel = fab.querySelector('#edPanel');
+  const icEdit = fab.querySelector('.ic-edit');
+  const icDone = fab.querySelector('.ic-done');
+
+  function labels() {
+    const pl = isPL();
+    fab.querySelector('.ed-lbl-toggle').textContent = editing ? (pl ? 'Gotowe' : 'Done') : (pl ? 'Edytuj' : 'Edit');
+    fab.querySelector('.ed-lbl-download').textContent = pl ? 'Pobierz HTML' : 'Download HTML';
+    fab.querySelector('.ed-lbl-reset').textContent = pl ? 'Resetuj zmiany' : 'Reset changes';
+    fab.querySelector('.ed-hint').textContent = pl
+      ? 'Kliknij dowolny tekst, aby go zmienić. Zmiany zapisują się same.'
+      : 'Click any text to change it. Changes save automatically.';
+  }
+
+  let editing = false;
+  function setEditing(on) {
+    editing = on;
+    root.classList.toggle('editing', on);
+    toggleBtn.classList.toggle('is-on', on);
+    toggleBtn.setAttribute('aria-pressed', String(on));
+    icEdit.style.display = on ? 'none' : '';
+    icDone.style.display = on ? '' : 'none';
+    panel.classList.toggle('open', on);
+    items.forEach(({ el }) => { el.contentEditable = on ? 'true' : 'false'; });
+    labels();
+  }
+
+  toggleBtn.addEventListener('click', () => setEditing(!editing));
+
+  // language change relabels the button
+  document.querySelectorAll('.langtog button').forEach(b =>
+    b.addEventListener('click', () => setTimeout(labels, 0)));
+
+  /* ---- reset ---- */
+  fab.querySelector('[data-act="reset"]').addEventListener('click', () => {
+    const msg = isPL() ? 'Cofnąć wszystkie zmiany w treści?' : 'Discard all text edits?';
+    if (!confirm(msg)) return;
+    Object.keys(localStorage).filter(k => k.startsWith(NS)).forEach(k => localStorage.removeItem(k));
+    location.reload();
+  });
+
+  /* ---- export current page (with edits baked in) ---- */
+  fab.querySelector('[data-act="download"]').addEventListener('click', async () => {
+    const clone = document.documentElement.cloneNode(true);
+    clone.classList.remove('editing');
+    clone.removeAttribute('data-lang');
+    clone.querySelectorAll('[data-edit-ui]').forEach(n => n.remove());
+    clone.querySelectorAll('[contenteditable]').forEach(n => n.removeAttribute('contenteditable'));
+    clone.querySelectorAll('[data-ek]').forEach(n => n.removeAttribute('data-ek'));
+    // inline external scripts so the file works standalone
+    const externs = [...clone.querySelectorAll('script[src]')];
+    for (const s of externs) {
+      try {
+        const code = await (await fetch(s.getAttribute('src'))).text();
+        const inl = document.createElement('script');
+        inl.textContent = code;
+        s.replaceWith(inl);
+      } catch (e) { /* keep external ref if fetch fails */ }
+    }
+    const html = '<!DOCTYPE html>\n' + clone.outerHTML;
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'kogniLAB-landing-' + variant + '.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  });
+
+  labels();
+})();
+
+</script>
+</body>
+</html>

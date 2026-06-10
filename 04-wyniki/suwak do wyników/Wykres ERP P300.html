@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wykres ERP — P300 High-FOMO vs Low-FOMO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #1c1c19;
+    --muted: #6f6f68;
+    --faint: #9a9a90;
+    --paper: #f3f1ea;
+    --line: #e2e1d8;
+    --card: #ffffff;
+    --accent: #4f46e5;
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  .page {
+    min-height: 100vh;
+    padding: 40px 24px 64px;
+    display: flex;
+    justify-content: center;
+  }
+  .sheet {
+    width: 100%;
+    max-width: 1060px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 24px 48px -28px rgba(40,38,30,.28);
+    padding: 38px 40px 34px;
+  }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -.018em;
+    margin: 0 0 10px;
+    line-height: 1.12;
+  }
+  .dek {
+    max-width: 78ch;
+    color: #45453f;
+    font-size: 15px;
+    margin: 0 0 18px;
+    text-wrap: pretty;
+  }
+  .dek b { font-weight: 600; }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 26px;
+    padding: 13px 0 0;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--ink);
+  }
+  .meta i { font-style: normal; color: var(--faint); margin-right: 7px; text-transform: uppercase; letter-spacing: .04em; font-size: 11px; }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px 30px;
+    margin: 26px 0 16px;
+  }
+  .seg-group { display: flex; flex-direction: column; gap: 7px; }
+  .seg-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .seg {
+    display: inline-flex;
+    background: #f1f0ea;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .seg-btn {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    border-radius: 6px;
+    padding: 7px 13px;
+    cursor: pointer;
+    font-family: var(--sans);
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.15;
+    transition: background .15s, color .15s, box-shadow .15s;
+  }
+  .seg-btn-main { font-size: 13.5px; font-weight: 500; }
+  .seg-btn-sub { font-size: 10.5px; color: var(--faint); font-weight: 400; }
+  .seg-btn:hover { color: var(--ink); }
+  .seg-btn.is-active {
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.04);
+  }
+  .seg-btn.is-active .seg-btn-sub { color: var(--muted); }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+    margin: 4px 0 14px;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .lg { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .lg i { width: 18px; height: 3px; border-radius: 2px; background: #ccc; display: inline-block; }
+  .lg em { font-style: normal; color: var(--faint); font-family: var(--mono); font-size: 11.5px; }
+  .lg--band i { height: 11px; border-radius: 3px; background: rgba(120,120,120,.18); }
+  .lg--win i { height: 11px; width: 18px; border-radius: 3px; background: rgba(99,102,241,.12); border: 1px dashed rgba(79,70,229,.6); }
+  .chart-wrap {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+    background: #fbfbf8;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px 8px;
+  }
+  .y-axis-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .04em;
+    color: var(--muted);
+    padding: 6px 0 26px;
+    align-self: center;
+  }
+  .chart-inner { flex: 1; min-width: 0; }
+  .x-axis-label {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .04em;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .winbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 14px 0 18px;
+    flex-wrap: wrap;
+  }
+  .winbar-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .winbar-hint svg { color: var(--accent); flex-shrink: 0; }
+  .reset-btn {
+    appearance: none;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink);
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .reset-btn:hover { border-color: var(--accent); background: #f7f7ff; color: var(--accent); }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  .tile {
+    background: #fbfbf8;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 13px 15px 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .tile::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: transparent;
+  }
+  .tile--high::before { background: var(--c-high, #d6294a); }
+  .tile--low::before { background: var(--c-low, #2b6cb0); }
+  .tile--accent { background: #f5f5ff; border-color: #e0e0fb; }
+  .tile--accent::before { background: var(--accent); }
+  .tile-label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+  .tile-value {
+    font-family: var(--mono);
+    font-size: 25px;
+    font-weight: 500;
+    letter-spacing: -.01em;
+    line-height: 1;
+  }
+  .tile-unit { font-size: 13px; color: var(--faint); margin-left: 4px; font-weight: 400; }
+  .tile-hint { font-size: 11px; color: var(--faint); margin-top: 6px; }
+  .interp {
+    font-size: 14px;
+    color: #45453f;
+    background: #faf9f4;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--ink);
+    border-radius: 0 8px 8px 0;
+    padding: 13px 16px;
+    margin: 0 0 16px;
+    text-wrap: pretty;
+  }
+  .interp b { font-weight: 600; }
+  .foot {
+    font-size: 11.5px;
+    color: var(--faint);
+    margin: 0;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+  @media (max-width: 760px) {
+    .sheet { padding: 26px 20px; }
+    h1 { font-size: 24px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .y-axis-label { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+
+  <!-- erp-data.js — inlined -->
+  <script>
+/* erp-data.js — Symulowany model danych ERP (P300) */
+(function () {
+  'use strict';
+  const T_MIN = -200, T_MAX = 800, DT = 2, N_PER_GROUP = 20;
+  function hash(x) { let h = Math.sin(x * 127.1 + 311.7) * 43758.5453; return (h - Math.floor(h)) * 2 - 1; }
+  function smoothNoise(t, seed) {
+    const s = (t + 1000) * 0.06 + seed * 17.3, i = Math.floor(s), f = s - i, u = f * f * (3 - 2 * f);
+    return hash(i + seed) * (1 - u) + hash(i + 1 + seed) * u;
+  }
+  function gauss(t, center, amp, width) { const d = (t - center) / width; return amp * Math.exp(-0.5 * d * d); }
+  const P300_AMP = {
+    powiadomienie: { High: [12.0, 11.6, 11.1], Low: [7.2, 5.6, 4.3] },
+    ton:           { High: [4.2, 3.8, 3.4],    Low: [4.0, 3.7, 3.3] },
+    natura:        { High: [3.1, 3.0, 2.9],    Low: [3.0, 2.9, 2.8] },
+  };
+  const CHANNEL_SCALE = { Pz: 1.0, Cz: 0.86 };
+  const GROUP_SD = { High: 3.0, Low: 2.7 };
+  function p300Amp(stimulus, group, block, channel) { return P300_AMP[stimulus][group][block - 1] * CHANNEL_SCALE[channel]; }
+  function sample(t, p300, seed) {
+    if (t < -50) return smoothNoise(t, seed) * 0.35;
+    let v = 0;
+    v += gauss(t, 95, -2.4, 32);
+    v += gauss(t, 195, 2.6, 38);
+    const peakCenter = 360 + (12 - p300) * 6;
+    v += gauss(t, peakCenter, p300, 78);
+    v += gauss(t, 540, p300 * 0.18 + 0.6, 150);
+    v += smoothNoise(t, seed) * 0.4;
+    return v;
+  }
+  function semAt(t, p300, seed) {
+    const env = Math.abs(gauss(t, 360, p300, 90)) * 0.12 + 0.45;
+    return env * (1 + smoothNoise(t, seed + 91) * 0.12);
+  }
+  function curve(stimulus, group, block, channel) {
+    const p300 = p300Amp(stimulus, group, block, channel);
+    const seed = (group === 'High' ? 3 : 11) + block * 5 + (channel === 'Pz' ? 0 : 23)
+               + ({ powiadomienie: 0, ton: 50, natura: 100 })[stimulus];
+    const out = [];
+    for (let t = T_MIN; t <= T_MAX; t += DT) out.push({ t, v: sample(t, p300, seed), sem: semAt(t, p300, seed) });
+    return out;
+  }
+  function windowMean(curveData, a, b) {
+    let sum = 0, n = 0;
+    for (const p of curveData) { if (p.t >= a && p.t <= b) { sum += p.v; n++; } }
+    return n ? sum / n : 0;
+  }
+  function peak(curveData) {
+    let best = { t: 0, v: -Infinity };
+    for (const p of curveData) { if (p.t >= 250 && p.t <= 560 && p.v > best.v) best = p; }
+    return best;
+  }
+  function cohensD(meanHigh, meanLow) {
+    const sH = GROUP_SD.High, sL = GROUP_SD.Low;
+    return (meanHigh - meanLow) / Math.sqrt((sH * sH + sL * sL) / 2);
+  }
+  function effectLabel(d) {
+    const a = Math.abs(d);
+    if (a < 0.2) return 'brak / znikomy';
+    if (a < 0.5) return 'mały';
+    if (a < 0.8) return 'średni';
+    return 'duży';
+  }
+  window.ERP = { T_MIN, T_MAX, DT, N_PER_GROUP, GROUP_SD, curve, windowMean, peak, cohensD, effectLabel, p300Amp };
+})();
+  </script>
+
+  <!-- tweaks-panel.jsx — inlined -->
+  <script type="text/babel">
+const __TWEAKS_STYLE = `
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;
+    max-height:calc(100vh - 32px);display:flex;flex-direction:column;
+    background:rgba(250,249,247,.92);color:#29261b;
+    backdrop-filter:blur(24px) saturate(160%);
+    border:.5px solid rgba(255,255,255,.6);border-radius:14px;
+    box-shadow:0 12px 40px rgba(0,0,0,.18);
+    font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 10px 14px;cursor:move;user-select:none}
+  .twk-hd b{font-size:12px;font-weight:600}
+  .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);width:22px;height:22px;border-radius:6px;cursor:pointer;font-size:13px}
+  .twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;min-height:0}
+  .twk-row{display:flex;flex-direction:column;gap:5px}
+  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;color:rgba(41,38,27,.72)}
+  .twk-lbl>span:first-child{font-weight:500}
+  .twk-val{color:rgba(41,38,27,.5);font-variant-numeric:tabular-nums}
+  .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(41,38,27,.45);padding:10px 0 0}
+  .twk-sect:first-child{padding-top:0}
+  .twk-field{appearance:none;box-sizing:border-box;width:100%;height:26px;padding:0 8px;border:.5px solid rgba(0,0,0,.1);border-radius:7px;background:rgba(255,255,255,.6);color:inherit;font:inherit;outline:none}
+  select.twk-field{padding-right:22px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='rgba(0,0,0,.5)' d='M0 0h10L5 6z'/></svg>");background-repeat:no-repeat;background-position:right 8px center}
+  .twk-slider{appearance:none;width:100%;height:4px;margin:6px 0;border-radius:999px;background:rgba(0,0,0,.12);outline:none}
+  .twk-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:pointer}
+  .twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;background:rgba(0,0,0,.06);user-select:none}
+  .twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);transition:left .15s,width .15s}
+  .twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;background:transparent;color:inherit;font:inherit;font-weight:500;min-height:22px;border-radius:6px;cursor:pointer;padding:4px 6px}
+  .twk-toggle{position:relative;width:32px;height:18px;border:0;border-radius:999px;background:rgba(0,0,0,.15);transition:background .15s;cursor:pointer;padding:0}
+  .twk-toggle[data-on="1"]{background:#34c759}
+  .twk-toggle i{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+  .twk-toggle[data-on="1"] i{transform:translateX(14px)}
+`;
+
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(defaults);
+  const setTweak = React.useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' ? keyOrEdits : { [keyOrEdits]: val };
+    setValues(prev => ({ ...prev, ...edits }));
+  }, []);
+  return [values, setTweak];
+}
+
+function TweaksPanel({ title = 'Tweaks', children }) {
+  const [open, setOpen] = React.useState(false);
+  const dragRef = React.useRef(null);
+  const offsetRef = React.useRef({ x: 16, y: 16 });
+
+  React.useEffect(() => {
+    const onMsg = e => {
+      if (e?.data?.type === '__activate_edit_mode') setOpen(true);
+      else if (e?.data?.type === '__deactivate_edit_mode') setOpen(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const onDragStart = e => {
+    const panel = dragRef.current; if (!panel) return;
+    const r = panel.getBoundingClientRect();
+    const sx = e.clientX, sy = e.clientY;
+    const startRight = window.innerWidth - r.right, startBottom = window.innerHeight - r.bottom;
+    const move = ev => {
+      offsetRef.current = { x: startRight - (ev.clientX - sx), y: startBottom - (ev.clientY - sy) };
+      panel.style.right = offsetRef.current.x + 'px'; panel.style.bottom = offsetRef.current.y + 'px';
+    };
+    const up = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
+    window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
+  };
+
+  if (!open) return null;
+  return (
+    <>
+      <style>{__TWEAKS_STYLE}</style>
+      <div ref={dragRef} className="twk-panel" style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}>
+        <div className="twk-hd" onMouseDown={onDragStart}>
+          <b>{title}</b>
+          <button className="twk-x" onClick={() => { setOpen(false); window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*'); }}>✕</button>
+        </div>
+        <div className="twk-body">{children}</div>
+      </div>
+    </>
+  );
+}
+
+function TweakSection({ label }) { return <div className="twk-sect">{label}</div>; }
+
+function TweakRow({ label, value, children, inline = false }) {
+  return (
+    <div className={inline ? 'twk-row twk-row-h' : 'twk-row'}>
+      <div className="twk-lbl"><span>{label}</span>{value != null && <span className="twk-val">{value}</span>}</div>
+      {children}
+    </div>
+  );
+}
+
+function TweakSlider({ label, value, min = 0, max = 100, step = 1, unit = '', onChange }) {
+  return (
+    <TweakRow label={label} value={`${value}${unit}`}>
+      <input type="range" className="twk-slider" min={min} max={max} step={step} value={value}
+             onChange={e => onChange(Number(e.target.value))} />
+    </TweakRow>
+  );
+}
+
+function TweakToggle({ label, value, onChange }) {
+  return (
+    <div className="twk-row twk-row-h">
+      <div className="twk-lbl"><span>{label}</span></div>
+      <button type="button" className="twk-toggle" data-on={value ? '1' : '0'}
+              onClick={() => onChange(!value)}><i /></button>
+    </div>
+  );
+}
+
+function TweakSelect({ label, value, options, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <select className="twk-field" value={value} onChange={e => onChange(e.target.value)}>
+        {options.map(o => { const v = typeof o === 'object' ? o.value : o; const l = typeof o === 'object' ? o.label : o; return <option key={v} value={v}>{l}</option>; })}
+      </select>
+    </TweakRow>
+  );
+}
+
+function TweakRadio({ label, value, options, onChange }) {
+  const opts = options.map(o => typeof o === 'object' ? o : { value: o, label: o });
+  const idx = Math.max(0, opts.findIndex(o => o.value === value));
+  const n = opts.length;
+  return (
+    <TweakRow label={label}>
+      <div className="twk-seg" role="radiogroup">
+        <div className="twk-seg-thumb" style={{ left: `calc(2px + ${idx} * (100% - 4px) / ${n})`, width: `calc((100% - 4px) / ${n})` }} />
+        {opts.map(o => (
+          <button key={o.value} type="button" role="radio" aria-checked={o.value === value} onClick={() => onChange(o.value)}>{o.label}</button>
+        ))}
+      </div>
+    </TweakRow>
+  );
+}
+
+Object.assign(window, { useTweaks, TweaksPanel, TweakSection, TweakRow, TweakSlider, TweakToggle, TweakRadio, TweakSelect });
+  </script>
+
+  <!-- erp-chart.jsx — inlined -->
+  <script type="text/babel">
+(function () {
+  'use strict';
+  const { useRef, useEffect } = React;
+  const M = { top: 34, right: 26, bottom: 56, left: 64 };
+  const Y_MIN = -5, Y_MAX = 16;
+  function lerp(a, b, k) { return a + (b - a) * k; }
+
+  function ERPChart({ stimulus, block, channel, win, onWindowChange, colors, showSEM, convention, height = 460 }) {
+    const wrapRef = useRef(null);
+    const canvasRef = useRef(null);
+    const animRef = useRef(null);
+    const stateRef = useRef({ disp: null, geom: null });
+    const dragRef = useRef(null);
+
+    function targets() {
+      return { High: window.ERP.curve(stimulus, 'High', block, channel), Low: window.ERP.curve(stimulus, 'Low', block, channel) };
+    }
+
+    function makeGeom(cssW) {
+      const x0 = M.left, x1 = cssW - M.right, y0 = M.top, y1 = height - M.bottom;
+      const tx = t => x0 + (t - window.ERP.T_MIN) / (window.ERP.T_MAX - window.ERP.T_MIN) * (x1 - x0);
+      const yv = v => { const vv = convention === 'neg' ? -v : v; return y1 - (vv - Y_MIN) / (Y_MAX - Y_MIN) * (y1 - y0); };
+      const xt = px => window.ERP.T_MIN + (px - x0) / (x1 - x0) * (window.ERP.T_MAX - window.ERP.T_MIN);
+      return { x0, x1, y0, y1, tx, yv, xt, cssW };
+    }
+
+    function hexA(hex, a) {
+      const h = hex.replace('#', '');
+      const r = parseInt(h.slice(0,2),16), gg = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+      return `rgba(${r},${gg},${b},${a})`;
+    }
+
+    function draw() {
+      const canvas = canvasRef.current; if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const cssW = wrapRef.current.clientWidth;
+      const dpr = window.devicePixelRatio || 1;
+      if (canvas.width !== Math.round(cssW * dpr) || canvas.height !== Math.round(height * dpr)) {
+        canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(height * dpr);
+        canvas.style.width = cssW + 'px'; canvas.style.height = height + 'px';
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, cssW, height);
+      const g = makeGeom(cssW); stateRef.current.geom = g;
+      const disp = stateRef.current.disp;
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(g.x0, g.y0, g.x1 - g.x0, g.y1 - g.y0);
+      ctx.lineWidth = 1; ctx.font = '11px "IBM Plex Mono", monospace'; ctx.textBaseline = 'middle';
+      for (let v = Y_MIN; v <= Y_MAX; v += 1) {
+        const major = v % 5 === 0; if (!major && (Y_MAX - Y_MIN) > 16) continue;
+        const py = g.yv(v);
+        ctx.strokeStyle = v === 0 ? '#c9c9c2' : (major ? '#e7e7e0' : '#f2f2ec');
+        ctx.beginPath(); ctx.moveTo(g.x0, py); ctx.lineTo(g.x1, py); ctx.stroke();
+        if (major) { ctx.fillStyle = '#8a8a82'; ctx.textAlign = 'right'; ctx.fillText(String(v), g.x0 - 9, py); }
+      }
+      for (let t = window.ERP.T_MIN; t <= window.ERP.T_MAX; t += 100) {
+        const px = g.tx(t); const major = t % 200 === 0;
+        ctx.strokeStyle = major ? '#e7e7e0' : '#f2f2ec';
+        ctx.beginPath(); ctx.moveTo(px, g.y0); ctx.lineTo(px, g.y1); ctx.stroke();
+        if (major) { ctx.fillStyle = '#8a8a82'; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillText(String(t), px, g.y1 + 8); ctx.textBaseline = 'middle'; }
+      }
+      const wx0 = g.tx(win.a), wx1 = g.tx(win.b);
+      ctx.fillStyle = 'rgba(99,102,241,0.08)'; ctx.fillRect(wx0, g.y0, wx1 - wx0, g.y1 - g.y0);
+      ctx.strokeStyle = 'rgba(79,70,229,0.55)'; ctx.setLineDash([4,3]); ctx.lineWidth = 1.25;
+      ctx.beginPath(); ctx.moveTo(wx0, g.y0); ctx.lineTo(wx0, g.y1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(wx1, g.y0); ctx.lineTo(wx1, g.y1); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(79,70,229,0.9)';
+      [wx0, wx1].forEach(x => ctx.fillRect(x - 2.5, (g.y0 + g.y1) / 2 - 16, 5, 32));
+      const zx = g.tx(0);
+      ctx.strokeStyle = '#3a3a36'; ctx.lineWidth = 1.4; ctx.setLineDash([2,3]);
+      ctx.beginPath(); ctx.moveTo(zx, g.y0); ctx.lineTo(zx, g.y1); ctx.stroke();
+      ctx.setLineDash([]);
+      if (!disp) return;
+      if (showSEM) {
+        [['Low', colors.low], ['High', colors.high]].forEach(([grp, col]) => {
+          const c = disp[grp];
+          ctx.beginPath();
+          for (let i = 0; i < c.length; i++) { const p = c[i]; const px = g.tx(p.t), py = g.yv(p.v + p.sem); i === 0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py); }
+          for (let i = c.length-1; i >= 0; i--) { const p = c[i]; ctx.lineTo(g.tx(p.t), g.yv(p.v - p.sem)); }
+          ctx.closePath(); ctx.fillStyle = hexA(col, 0.13); ctx.fill();
+        });
+      }
+      [['Low', colors.low], ['High', colors.high]].forEach(([grp, col]) => {
+        const c = disp[grp];
+        ctx.beginPath();
+        for (let i = 0; i < c.length; i++) { const p = c[i]; const px = g.tx(p.t), py = g.yv(p.v); i === 0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py); }
+        ctx.strokeStyle = col; ctx.lineWidth = 2.4; ctx.lineJoin = 'round'; ctx.stroke();
+      });
+      const pk = window.ERP.peak(disp.High);
+      const ppx = g.tx(pk.t), ppy = g.yv(pk.v);
+      ctx.fillStyle = colors.high; ctx.beginPath(); ctx.arc(ppx, ppy, 3.4, 0, Math.PI*2); ctx.fill();
+      const labY = Math.max(ppy - 46, g.y0 + 12);
+      ctx.strokeStyle = colors.high; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(ppx, ppy-6); ctx.lineTo(ppx, labY+14); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(ppx, ppy-6); ctx.lineTo(ppx-3.5, ppy-12); ctx.lineTo(ppx+3.5, ppy-12); ctx.closePath(); ctx.fillStyle = colors.high; ctx.fill();
+      ctx.font = '600 12px "IBM Plex Sans",sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = colors.high; ctx.fillText('P300', ppx, labY);
+      ctx.font = '11px "IBM Plex Mono",monospace'; ctx.fillStyle = '#5a5a54'; ctx.fillText(pk.v.toFixed(1) + ' μV · ' + Math.round(pk.t) + ' ms', ppx, labY+13);
+      ctx.strokeStyle = '#3a3a36'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(g.x0, g.y1); ctx.lineTo(g.x1, g.y1); ctx.stroke();
+    }
+
+    useEffect(() => {
+      const tg = targets(); const from = stateRef.current.disp;
+      if (!from) { stateRef.current.disp = tg; draw(); return; }
+      const start = performance.now(); const DUR = 420;
+      cancelAnimationFrame(animRef.current);
+      const fromSnap = { High: from.High.map(p => ({...p})), Low: from.Low.map(p => ({...p})) };
+      function step(now) {
+        const k = Math.min(1, (now-start)/DUR);
+        const e = k < 0.5 ? 2*k*k : 1 - Math.pow(-2*k+2,2)/2;
+        const cur = {};
+        ['High','Low'].forEach(grp => { cur[grp] = tg[grp].map((p,i) => ({ t:p.t, v:lerp(fromSnap[grp][i].v, p.v, e), sem:lerp(fromSnap[grp][i].sem, p.sem, e) })); });
+        stateRef.current.disp = cur; draw();
+        if (k < 1) animRef.current = requestAnimationFrame(step);
+      }
+      animRef.current = requestAnimationFrame(step);
+      return () => cancelAnimationFrame(animRef.current);
+    }, [stimulus, block, channel]);
+
+    useEffect(() => { draw(); }, [win.a, win.b, colors.high, colors.low, showSEM, convention]);
+    useEffect(() => {
+      const ro = new ResizeObserver(() => draw()); ro.observe(wrapRef.current); return () => ro.disconnect();
+    }, []);
+
+    function pointerT(e) { const g = stateRef.current.geom; const rect = canvasRef.current.getBoundingClientRect(); return g.xt(e.clientX - rect.left); }
+    function onDown(e) {
+      const g = stateRef.current.geom; if (!g) return;
+      const rect = canvasRef.current.getBoundingClientRect(); const px = e.clientX - rect.left;
+      const wx0 = g.tx(win.a), wx1 = g.tx(win.b);
+      let mode = null;
+      if (Math.abs(px-wx0) < 9) mode = 'a'; else if (Math.abs(px-wx1) < 9) mode = 'b'; else if (px>wx0 && px<wx1) mode = 'move'; else return;
+      dragRef.current = { mode, startT: pointerT(e), a0: win.a, b0: win.b };
+      e.target.setPointerCapture(e.pointerId);
+    }
+    function onMove(e) {
+      const g = stateRef.current.geom; if (!g) return;
+      const rect = canvasRef.current.getBoundingClientRect(); const px = e.clientX - rect.left;
+      const wx0 = g.tx(win.a), wx1 = g.tx(win.b);
+      if (!dragRef.current) { const near = Math.abs(px-wx0)<9||Math.abs(px-wx1)<9; const inside=px>wx0&&px<wx1; canvasRef.current.style.cursor = near?'ew-resize':(inside?'grab':'default'); return; }
+      const d = dragRef.current; const t = pointerT(e);
+      const clamp = x => Math.max(window.ERP.T_MIN, Math.min(window.ERP.T_MAX, x));
+      const snap = x => Math.round(x/10)*10;
+      if (d.mode==='a') onWindowChange({a:snap(clamp(Math.min(t,d.b0-20))),b:d.b0});
+      else if (d.mode==='b') onWindowChange({a:d.a0,b:snap(clamp(Math.max(t,d.a0+20)))});
+      else { const dt=t-d.startT; let na=d.a0+dt,nb=d.b0+dt; if(na<window.ERP.T_MIN){nb+=window.ERP.T_MIN-na;na=window.ERP.T_MIN;} if(nb>window.ERP.T_MAX){na-=nb-window.ERP.T_MAX;nb=window.ERP.T_MAX;} onWindowChange({a:snap(na),b:snap(nb)}); }
+    }
+    function onUp() { if (dragRef.current) { dragRef.current = null; canvasRef.current.style.cursor = 'grab'; } }
+
+    return (
+      <div ref={wrapRef} style={{ width:'100%', position:'relative', userSelect:'none', touchAction:'none' }}>
+        <canvas ref={canvasRef} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerLeave={onUp} style={{ display:'block', borderRadius:6 }} />
+      </div>
+    );
+  }
+  window.ERPChart = ERPChart;
+})();
+  </script>
+
+  <!-- app.jsx — inlined -->
+  <script type="text/babel">
+(function () {
+  'use strict';
+  const { useState, useMemo } = React;
+
+  const STIM = [
+    { id: 'powiadomienie', label: 'Powiadomienie', sub: 'bodziec kluczowy' },
+    { id: 'ton',           label: 'Ton neutralny', sub: 'kontrola dźwięku' },
+    { id: 'natura',        label: 'Natura',         sub: 'kontrola' },
+  ];
+  const PALETTES = {
+    'Crimson / Blue':   { high: '#d6294a', low: '#2b6cb0' },
+    'Amber / Teal':     { high: '#d97706', low: '#0e8a86' },
+    'Magenta / Slate':  { high: '#be185d', low: '#475569' },
+  };
+  const TWEAK_DEFAULTS = { palette: 'Crimson / Blue', showSEM: true, convention: 'pos' };
+
+  function Segmented({ label, options, value, onChange }) {
+    return (
+      <div className="seg-group">
+        <div className="seg-label">{label}</div>
+        <div className="seg" role="tablist">
+          {options.map(o => (
+            <button key={o.id} role="tab" aria-selected={value===o.id} className={'seg-btn'+(value===o.id?' is-active':'')} onClick={()=>onChange(o.id)}>
+              <span className="seg-btn-main">{o.label}</span>
+              {o.sub && <span className="seg-btn-sub">{o.sub}</span>}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function StatTile({ label, value, unit, tone, hint }) {
+    return (
+      <div className={'tile'+(tone?' tile--'+tone:'')}>
+        <div className="tile-label">{label}</div>
+        <div className="tile-value">{value}{unit && <span className="tile-unit">{unit}</span>}</div>
+        {hint && <div className="tile-hint">{hint}</div>}
+      </div>
+    );
+  }
+
+  const INTERP = {
+    powiadomienie: 'H2 — u grupy High-FOMO amplituda P300 pozostaje wysoka i stabilna we wszystkich blokach (brak wygaszania reakcji orientacyjnej), podczas gdy u Low-FOMO systematycznie maleje — klasyczna habituacja.',
+    ton: 'Bodziec neutralny — brak istotnej różnicy między grupami. Efekt jest specyficzny dla semantycznego znaczenia powiadomienia, nie dla dźwięku per se.',
+    natura: 'Bodziec kontrolny (natura) — amplitudy niskie i porównywalne. Potwierdza specyficzność efektu dla bodźca kluczowego.',
+  };
+
+  function App() {
+    const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+    const [stimulus, setStimulus] = useState('powiadomienie');
+    const [block, setBlock] = useState(1);
+    const [channel, setChannel] = useState('Pz');
+    const [win, setWin] = useState({ a: 300, b: 500 });
+    const colors = PALETTES[t.palette] || PALETTES['Crimson / Blue'];
+
+    const stats = useMemo(() => {
+      const cHigh = window.ERP.curve(stimulus,'High',block,channel);
+      const cLow  = window.ERP.curve(stimulus,'Low',block,channel);
+      const mH = window.ERP.windowMean(cHigh,win.a,win.b);
+      const mL = window.ERP.windowMean(cLow,win.a,win.b);
+      const diff = mH - mL;
+      const d = window.ERP.cohensD(mH,mL);
+      return { mH, mL, diff, d, label: window.ERP.effectLabel(d) };
+    }, [stimulus, block, channel, win.a, win.b]);
+
+    const isP300win = win.a>=280 && win.b<=520 && (win.b-win.a)>=120;
+
+    return (
+      <div className="page" style={{ '--c-high': colors.high, '--c-low': colors.low }}>
+        <div className="sheet">
+          <div className="eyebrow">04 · Oczekiwane wyniki — komponent P300 (ERP)</div>
+          <h1>Reakcja orientacyjna na powiadomienie</h1>
+          <p className="dek">
+            Symulowane uśrednienie ERP (grand average). Porównanie amplitudy{' '}
+            <b style={{ color: colors.high }}>P300</b> między grupami <b>High-FOMO</b> i <b>Low-FOMO</b>.{' '}
+            Przeciągnij zacienione okno pomiarowe, aby wyznaczyć średnią amplitudę w dowolnym przedziale.
+          </p>
+          <div className="meta">
+            <span><i>Kanał</i>{channel}</span>
+            <span><i>Okno</i>300–500 ms</span>
+            <span><i>Próba</i>N = 40 (2×20)</span>
+            <span><i>Bodziec</i>{STIM.find(s=>s.id===stimulus).label}</span>
+          </div>
+
+          <div className="controls">
+            <Segmented label="Bodziec" value={stimulus} onChange={setStimulus} options={STIM.map(s=>({id:s.id,label:s.label,sub:s.sub}))} />
+            <Segmented label="Blok · habituacja" value={block} onChange={setBlock}
+              options={[{id:1,label:'Blok 1'},{id:2,label:'Blok 2'},{id:3,label:'Blok 3'}]} />
+            <Segmented label="Elektroda" value={channel} onChange={setChannel}
+              options={[{id:'Pz',label:'Pz'},{id:'Cz',label:'Cz'}]} />
+          </div>
+
+          <div className="legend">
+            <span className="lg"><i style={{background:colors.high}}></i>High-FOMO <em>n=20</em></span>
+            <span className="lg"><i style={{background:colors.low}}></i>Low-FOMO <em>n=20</em></span>
+            <span className="lg lg--band"><i></i>±1 SEM</span>
+            <span className="lg lg--win"><i></i>okno pomiarowe</span>
+          </div>
+
+          <div className="chart-wrap">
+            <div className="y-axis-label">Amplituda (μV){t.convention==='neg'?' · − w górę':''}</div>
+            <div className="chart-inner">
+              <ERPChart stimulus={stimulus} block={block} channel={channel}
+                win={win} onWindowChange={setWin} colors={colors} showSEM={t.showSEM} convention={t.convention} height={460} />
+              <div className="x-axis-label">Czas od emisji bodźca (ms) — 0 ms = bodziec</div>
+            </div>
+          </div>
+
+          <div className="winbar">
+            <span className="winbar-hint">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8 7L4 11l4 4M16 7l4 4-4 4M4 11h16"/></svg>
+              Przeciągnij okno · złap krawędź aby zmienić szerokość
+            </span>
+            <button className="reset-btn" onClick={()=>setWin({a:300,b:500})}>Okno P300 (300–500 ms)</button>
+          </div>
+
+          <div className="stats">
+            <StatTile label="Okno pomiarowe" value={`${Math.round(win.a)}–${Math.round(win.b)}`} unit="ms" hint={isP300win?'pokrywa P300':'poza standardowym oknem'} />
+            <StatTile label="Średnia High-FOMO" value={stats.mH.toFixed(2)} unit="μV" tone="high" />
+            <StatTile label="Średnia Low-FOMO"  value={stats.mL.toFixed(2)} unit="μV" tone="low" />
+            <StatTile label="Różnica Δ" value={(stats.diff>=0?'+':'')+stats.diff.toFixed(2)} unit="μV" />
+            <StatTile label="d Cohena" value={stats.d.toFixed(2)} tone="accent" hint={`efekt: ${stats.label}`} />
+          </div>
+
+          <p className="interp"><b>Interpretacja.</b> {INTERP[stimulus]}</p>
+          <p className="foot">Dane symulowane na potrzeby wizualizacji oczekiwanego wzorca. Wartości nie pochodzą z pomiaru. Test hipotezy H2: mieszana ANOVA Grupa × Bodziec × Blok.</p>
+
+          <TweaksPanel>
+            <TweakSection label="Krzywe" />
+            <TweakSelect label="Paleta grup" value={t.palette} options={Object.keys(PALETTES)} onChange={v=>setTweak('palette',v)} />
+            <TweakToggle label="Pasmo ±1 SEM" value={t.showSEM} onChange={v=>setTweak('showSEM',v)} />
+            <TweakSection label="Oś amplitudy" />
+            <TweakRadio label="Konwencja" value={t.convention} options={[{value:'pos',label:'+ w górę'},{value:'neg',label:'− w górę'}]} onChange={v=>setTweak('convention',v)} />
+          </TweaksPanel>
+        </div>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+})();
+  </script>
+</body>
+</html>

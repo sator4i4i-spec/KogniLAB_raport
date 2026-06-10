@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>kogniLAB · FOMO / EEG — Raport (wariant B)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --umk-blue:#034EA1;
+  --navy:#04203f;
+  --navy-2:#06346a;
+  --gold:#FFCD00;
+  --gold-deep:#ffd84a;
+  --paper:#ffffff;
+  --ink:#13233b;
+  --ink-soft:#43566f;
+  --line-d:rgba(255,255,255,.14);
+  --line-d2:rgba(255,255,255,.09);
+  --txt-d:#eaf1fb;
+  --txt-d-soft:#a9c2e2;
+  --serif:"Source Serif 4",Georgia,serif;
+  --sans:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --maxw:1180px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);color:var(--txt-d);
+  background:#04203f;-webkit-font-smoothing:antialiased;line-height:1.55;
+}
+.lang-en{display:none}
+html[data-lang="en"] .lang-pl{display:none}
+html[data-lang="en"] .lang-en{display:revert}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:40;background:rgba(4,32,63,.78);backdrop-filter:saturate(140%) blur(12px);border-bottom:1px solid var(--line-d)}
+.nav__inner{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;gap:22px;padding:13px 28px}
+.brand{display:flex;align-items:center;gap:11px;flex-shrink:0}
+.brand__mark{width:30px;height:30px;border-radius:50%;background:#fff;position:relative;flex-shrink:0;display:grid;place-items:center}
+.brand__mark::after{content:"";width:11px;height:11px;border-radius:50%;background:var(--gold)}
+.brand__mark::before{content:"";position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);width:7px;height:7px;border-radius:50%;background:#fff;border:2px solid var(--navy)}
+.brand__txt{display:flex;flex-direction:column;line-height:1}
+.brand__name{font-weight:700;font-size:15px;letter-spacing:-.01em;color:#fff}
+.brand__name b{color:var(--gold)}
+.brand__sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--txt-d-soft);text-transform:uppercase;margin-top:3px}
+.nav__links{display:flex;align-items:center;gap:1px;flex:1;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent)}
+.nav__links::-webkit-scrollbar{display:none}
+.nav__link{display:flex;align-items:center;gap:6px;white-space:nowrap;font-size:12.5px;font-weight:500;color:var(--txt-d-soft);padding:7px 10px;border-radius:7px;transition:.16s}
+.nav__link:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nav__link.is-active{color:var(--navy);background:var(--gold)}
+.nav__link.is-active i{color:var(--navy)}
+.nav__link i{font-family:var(--mono);font-size:10.5px;font-style:normal;color:var(--gold);font-weight:600}
+.nav__tools{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.langtog{display:flex;border:1px solid var(--line-d);border-radius:8px;overflow:hidden;font-family:var(--mono)}
+.langtog button{font-family:inherit;font-size:11.5px;font-weight:600;letter-spacing:.04em;padding:6px 11px;background:transparent;border:none;color:var(--txt-d-soft);cursor:pointer;transition:.15s}
+.langtog button[aria-pressed="true"]{background:var(--gold);color:var(--navy)}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;text-align:center;
+  background:radial-gradient(120% 90% at 50% -10%,#0a437f 0%,#06346a 38%,#04203f 78%)}
+#eeg{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;opacity:.9}
+.hero__fade{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(80% 60% at 50% 42%,rgba(4,32,63,0) 0%,rgba(4,32,63,.35) 70%,rgba(4,32,63,.7) 100%)}
+.hero__inner{position:relative;z-index:2;max-width:980px;margin:0 auto;padding:70px 28px 58px;display:flex;flex-direction:column;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:12px;font-family:var(--mono);font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(255,205,0,.4);border-radius:100px;padding:8px 16px;background:rgba(255,205,0,.06)}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px rgba(255,205,0,.22)}
+.eyebrow .discipline-tag{color:var(--txt-d-soft)}
+h1.title{font-family:var(--serif);font-weight:600;letter-spacing:-.02em;font-size:clamp(36px,5.8vw,70px);line-height:1.08;margin:26px 0 0;max-width:16ch;color:#fff;text-wrap:balance}
+h1.title .fomo{color:var(--gold)}
+.subtitle{font-family:var(--serif);font-size:clamp(18px,2.1vw,23px);line-height:1.5;color:var(--txt-d-soft);max-width:50ch;margin:32px auto 0;font-weight:400}
+.meta{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px 16px;margin-top:30px}
+.meta__item{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--txt-d)}
+.meta__item .k{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-d-soft)}
+.meta__item .v{font-weight:600;color:#fff}
+.meta__sep{width:1px;height:16px;background:var(--line-d)}
+
+/* HOOK — oversized */
+.hook{margin-top:54px;width:100%;max-width:880px;border-top:1px solid var(--line-d);border-bottom:1px solid var(--line-d);
+  padding:34px 0;display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:center;text-align:left}
+.hook__num{font-family:var(--serif);font-weight:700;line-height:.82;font-size:clamp(86px,15vw,160px);letter-spacing:-.04em;color:var(--gold);display:flex;align-items:flex-start;text-shadow:0 0 40px rgba(255,205,0,.25);padding-right:12px}
+.hook__num sup{font-size:.4em;font-weight:600;margin-top:.28em;color:#fff;opacity:.8}
+.hook__body p{font-size:17px;line-height:1.52;color:var(--txt-d);max-width:40ch}
+.hook__body p b{color:#fff}
+.hook__body .src{display:block;margin-top:11px;font-family:var(--mono);font-size:11px;color:var(--txt-d-soft);letter-spacing:.02em}
+
+.scrollcue{display:flex;align-items:center;gap:10px;margin-top:42px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--txt-d-soft)}
+.scrollcue .line{width:46px;height:1px;background:var(--txt-d-soft);position:relative;overflow:hidden}
+.scrollcue .line::after{content:"";position:absolute;inset:0;width:40%;background:var(--gold);animation:slide 1.9s ease-in-out infinite}
+@keyframes slide{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
+
+/* ABSTRACT on light */
+.abstract{background:var(--paper);color:var(--ink);border-top:3px solid var(--gold)}
+.abstract__wrap{max-width:var(--maxw);margin:0 auto;padding:64px 28px 84px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:30px}
+.sec-head .no{font-family:var(--mono);font-size:13px;color:var(--gold-deep);font-weight:600;color:#c79a00}
+.sec-head h2{font-family:var(--serif);font-weight:600;font-size:clamp(24px,3vw,32px);letter-spacing:-.01em;color:var(--ink)}
+.sec-head .rule{flex:1;height:1px;background:#e2e8f1}
+.abs-grid{display:grid;grid-template-columns:1.05fr 1.35fr;gap:46px;align-items:start}
+@media(max-width:880px){.abs-grid{grid-template-columns:1fr;gap:30px}}
+.tldr__label{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--umk-blue);margin-bottom:16px;display:flex;align-items:center;gap:9px}
+.tldr__label::before{content:"";width:22px;height:2px;background:var(--gold)}
+.tldr{display:flex;flex-direction:column;gap:14px}
+.tldr__item{display:grid;grid-template-columns:auto 1fr;gap:15px;align-items:start;background:#f5f8fc;border:1px solid #e2e8f1;border-radius:14px;padding:17px 19px}
+.tldr__ico{width:34px;height:34px;border-radius:9px;background:#fff;border:1px solid #e2e8f1;display:grid;place-items:center;color:var(--umk-blue);flex-shrink:0}
+.tldr__ico svg{width:18px;height:18px}
+.tldr__item h3{font-size:13.5px;font-weight:700;margin-bottom:3px;letter-spacing:.01em;color:var(--ink)}
+.tldr__item p{font-size:13.5px;color:var(--ink-soft);line-height:1.45}
+.tldr__item .em{color:var(--umk-blue);font-weight:600}
+.abs-full{font-family:var(--serif)}
+.abs-full__lead{font-size:19px;line-height:1.62;color:var(--ink);font-weight:500}
+.abs-full__lead b{color:var(--umk-blue)}
+.abs-more{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.4,0,.2,1)}
+.abs-more__inner{padding-top:18px}
+.abs-full p{font-size:16px;line-height:1.66;color:var(--ink-soft);margin-top:15px}
+.abs-full p b{color:var(--umk-blue)}
+.abs-toggle{margin-top:20px;display:inline-flex;align-items:center;gap:10px;font-family:var(--sans);font-size:13.5px;font-weight:600;color:#fff;background:var(--umk-blue);border:1px solid var(--umk-blue);border-radius:100px;padding:10px 18px;cursor:pointer;transition:.18s}
+.abs-toggle:hover{background:#023d80}
+.abs-toggle .chev{transition:transform .35s;display:grid;place-items:center}
+.abs-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.abs-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.abs-tag{font-family:var(--mono);font-size:11px;color:var(--ink-soft);border:1px solid #e2e8f1;border-radius:7px;padding:5px 10px;background:#fff}
+.abs-tag b{color:var(--umk-blue)}
+footer.mini{background:var(--navy);max-width:none}
+.footer__wrap{max-width:var(--maxw);margin:0 auto;padding:24px 28px 50px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;font-family:var(--mono);font-size:11px;color:var(--txt-d-soft);letter-spacing:.03em}
+</style>
+</head>
+<body data-variant="b">
+
+<nav class="nav">
+  <div class="nav__inner">
+    <a class="brand" href="#01-landing" aria-label="kogniLAB">
+      <span class="brand__mark"></span>
+      <span class="brand__txt">
+        <span class="brand__name">kogni<b>LAB</b></span>
+        <span class="brand__sub">UMK&nbsp;×&nbsp;UW · EEG</span>
+      </span>
+    </a>
+    <div class="nav__links" id="navLinks">
+      <a class="nav__link" href="#01-landing"><i>01</i><span class="lang-pl">Start</span><span class="lang-en">Start</span></a>
+      <a class="nav__link" href="#02-wprowadzenie"><i>02</i><span class="lang-pl">Wprowadzenie</span><span class="lang-en">Introduction</span></a>
+      <a class="nav__link" href="#03-cel-i-hipotezy"><i>03</i><span class="lang-pl">Cel i hipotezy</span><span class="lang-en">Aim &amp; hypotheses</span></a>
+      <a class="nav__link" href="#04-metodologia"><i>04</i><span class="lang-pl">Metodologia</span><span class="lang-en">Methods</span></a>
+      <a class="nav__link" href="#05-wyniki"><i>05</i><span class="lang-pl">Wyniki</span><span class="lang-en">Results</span></a>
+      <a class="nav__link" href="#06-budzet"><i>06</i><span class="lang-pl">Budżet</span><span class="lang-en">Budget</span></a>
+      <a class="nav__link" href="#07-zespol"><i>07</i><span class="lang-pl">Zespół</span><span class="lang-en">Team</span></a>
+      <a class="nav__link" href="#08-harmonogram"><i>08</i><span class="lang-pl">Harmonogram</span><span class="lang-en">Timeline</span></a>
+      <a class="nav__link" href="#09-glossary"><i>09</i><span class="lang-pl">Słownik</span><span class="lang-en">Glossary</span></a>
+      <a class="nav__link" href="#10-bibliografia"><i>10</i><span class="lang-pl">Bibliografia</span><span class="lang-en">References</span></a>
+      <a class="nav__link" href="#11-tworzenie-raportu"><i>11</i><span class="lang-pl">O raporcie</span><span class="lang-en">About</span></a>
+    </div>
+    <div class="nav__tools">
+      <div class="langtog" role="group" aria-label="Język / Language">
+        <button data-lang="pl" aria-pressed="true">PL</button>
+        <button data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="01-landing" data-screen-label="01 Landing">
+  <canvas id="eeg"></canvas>
+  <div class="hero__fade"></div>
+  <div class="hero__inner">
+    <span class="eyebrow">
+      <span class="dot"></span>
+      <span class="lang-pl">Projekt badawczy · Kognitywistyka</span><span class="lang-en">Research project · Cognitive Science</span>
+      <span class="discipline-tag">· 2025/2026</span>
+    </span>
+
+    <h1 class="title">
+      <span class="lang-pl">Neuronalne i behawioralne korelaty <span class="fomo">FOMO</span></span>
+      <span class="lang-en">Neural &amp; behavioral correlates of <span class="fomo">FOMO</span></span>
+    </h1>
+
+    <p class="subtitle">
+      <span class="lang-pl">Badanie EEG mierzące reakcję mózgu na dźwięki powiadomień u osób o wysokim i niskim lęku przed pominięciem — gdy telefon jest poza zasięgiem.</span>
+      <span class="lang-en">An EEG study measuring the brain's response to notification sounds in people with high vs. low fear of missing out — when the phone is out of reach.</span>
+    </p>
+
+    <div class="meta">
+      <span class="meta__item"><span class="k">Autor</span><span class="v">D. Satora-Izquierdo</span></span>
+      <span class="meta__sep"></span>
+      <span class="meta__item"><span class="k">Dyscyplina</span><span class="v"><span class="lang-pl">Kognitywistyka</span><span class="lang-en">Cognitive Science</span></span></span>
+      <span class="meta__sep"></span>
+      <span class="meta__item"><span class="k"><span class="lang-pl">Ośrodki</span><span class="lang-en">Institutions</span></span><span class="v">UMK · UW</span></span>
+      <span class="meta__sep"></span>
+      <span class="meta__item"><span class="k"><span class="lang-pl">Metoda</span><span class="lang-en">Method</span></span><span class="v">EEG 64‑ch · P300 · FAA</span></span>
+    </div>
+
+    <div class="hook">
+      <div class="hook__num">69<sup>%</sup></div>
+      <div class="hook__body">
+        <p>
+          <span class="lang-pl">młodych użytkowników mediów społecznościowych w USA doświadcza <b>FOMO</b> — lęku przed pominięciem. To już nie niszowy problem, lecz powszechny mechanizm kognitywny.</span>
+          <span class="lang-en">of young social-media users in the US experience <b>FOMO</b> — the fear of missing out. No longer a niche issue, but a widespread cognitive mechanism.</span>
+        </p>
+        <span class="src">Bartosiak i in., 2025 · PLOS ONE</span>
+      </div>
+    </div>
+
+    <div class="scrollcue">
+      <span class="line"></span>
+      <span class="lang-pl">Przewiń do streszczenia</span><span class="lang-en">Scroll to summary</span>
+    </div>
+  </div>
+</header>
+
+<section class="abstract" id="abstract" aria-label="Streszczenie">
+  <div class="abstract__wrap">
+    <div class="sec-head">
+      <span class="no">00</span>
+      <h2><span class="lang-pl">Streszczenie</span><span class="lang-en">Abstract</span></h2>
+      <span class="rule"></span>
+    </div>
+
+    <div class="abs-grid">
+      <div class="tldr-col">
+        <div class="tldr__label"><span class="lang-pl">W 15 sekund</span><span class="lang-en">In 15 seconds</span></div>
+        <div class="tldr">
+          <div class="tldr__item">
+            <span class="tldr__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.3-4.3"/></svg></span>
+            <div>
+              <h3><span class="lang-pl">Pytanie</span><span class="lang-en">Question</span></h3>
+              <p><span class="lang-pl">Jak mózg reaguje na <span class="em">dźwięk powiadomienia</span>, gdy nie wolno sprawdzić telefonu?</span><span class="lang-en">How does the brain react to a <span class="em">notification sound</span> when checking the phone is forbidden?</span></p>
+            </div>
+          </div>
+          <div class="tldr__item">
+            <span class="tldr__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h3l2-7 4 14 2-7h7"/></svg></span>
+            <div>
+              <h3><span class="lang-pl">Metoda</span><span class="lang-en">Method</span></h3>
+              <p><span class="lang-pl">EEG 64‑kanałowy, <span class="em">N = 40</span> (wysokie vs niskie FOMO). Wskaźniki: fala P300 i asymetria czołowa alfa.</span><span class="lang-en">64-channel EEG, <span class="em">N = 40</span> (high vs low FOMO). Markers: P300 wave and frontal alpha asymmetry.</span></p>
+            </div>
+          </div>
+          <div class="tldr__item">
+            <span class="tldr__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v3M12 18v3M5 12H2M22 12h-3M6 6l-2-2M20 20l-2-2M18 6l2-2M4 20l2-2"/><circle cx="12" cy="12" r="3.4"/></svg></span>
+            <div>
+              <h3><span class="lang-pl">Hipoteza</span><span class="lang-en">Hypothesis</span></h3>
+              <p><span class="lang-pl">Wysokie FOMO = <span class="em">silniejsza i nieustępująca</span> reakcja mózgu: większa P300 i spadek mocy alfa po lewej stronie.</span><span class="lang-en">High FOMO = a <span class="em">stronger, non-habituating</span> brain response: larger P300 and a drop in left-frontal alpha power.</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="abs-full">
+        <p class="abs-full__lead">
+          <span class="lang-pl">Lęk przed pominięciem (FOMO) stał się powszechnym zjawiskiem kognitywnym i społecznym. Dotychczasowe badania opierały się głównie na kwestionariuszach — ten projekt wykorzystuje <b>EEG o rozdzielczości milisekundowej</b>, by obiektywnie zmierzyć reakcję mózgu na dźwiękowe powiadomienia.</span>
+          <span class="lang-en">The fear of missing out (FOMO) has become a widespread cognitive and social phenomenon. Prior research relied mostly on questionnaires — this project uses <b>millisecond-resolution EEG</b> to objectively measure the brain's response to notification sounds.</span>
+        </p>
+
+        <div class="abs-more" id="absMore" aria-hidden="true">
+          <div class="abs-more__inner">
+            <p><span class="lang-pl">W badaniu weźmie udział 40 osób w wieku 18–25 lat, wyłonionych metodą doboru skrajnego: 20 osób o wysokim i 20 o niskim poziomie FOMO. Podczas zadania ciągłego wykonania (CPT) rejestrowany jest 64‑kanałowy sygnał EEG, a w tle losowo emitowane są trzy typy bodźców: kluczowy (indywidualny dźwięk powiadomienia uczestnika), neutralny i kontrolny. Przez cały czas uczestnik nie może dotknąć telefonu.</span>
+            <span class="lang-en">Forty participants aged 18–25 are selected by extreme-groups sampling: 20 with high and 20 with low FOMO. During a continuous performance task (CPT), 64-channel EEG is recorded while three sound types are played at random in the background: key (the participant's own notification sound), neutral and control. Throughout, the participant cannot touch the phone.</span></p>
+
+            <p><span class="lang-pl">Analizie poddane zostaną dwa wskaźniki: amplituda fali <b>P300</b> (odpowiedź orientacyjna na dystraktor) oraz <b>asymetria czołowa alfa (FAA)</b> jako marker pobudzenia i gotowości do działania. Oczekujemy, że osoby o wysokim FOMO wykażą silniejszy spadek mocy alfa w lewej korze czołowej oraz wyższą amplitudę i brak habituacji fali P300 — co wskazywałoby na utrzymujący się stan pobudzenia i frustracji.</span>
+            <span class="lang-en">Two markers are analysed: <b>P300</b> amplitude (an orienting response to the distractor) and <b>frontal alpha asymmetry (FAA)</b> as a marker of arousal and action readiness. We expect high-FOMO individuals to show a stronger drop in left-frontal alpha power and a larger, non-habituating P300 — indicating a sustained state of arousal and frustration.</span></p>
+
+            <p><span class="lang-pl">Wyniki pozwolą lepiej zrozumieć neurobiologiczne podłoże kompulsywnego sięgania po telefon i mogą stać się podstawą interwencji ograniczających negatywne skutki FOMO.</span>
+            <span class="lang-en">The findings will deepen our understanding of the neurobiology behind compulsive phone-checking and may inform interventions that mitigate the negative effects of FOMO.</span></p>
+          </div>
+        </div>
+
+        <button class="abs-toggle" id="absToggle" aria-expanded="false" aria-controls="absMore">
+          <span class="abs-toggle__txt"><span class="lang-pl">Czytaj pełny abstrakt</span><span class="lang-en">Read full abstract</span></span>
+          <span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg></span>
+        </button>
+
+        <div class="abs-tags">
+          <span class="abs-tag">FOMO</span>
+          <span class="abs-tag">EEG · 64‑ch</span>
+          <span class="abs-tag"><b>P300</b></span>
+          <span class="abs-tag">Frontal Alpha Asymmetry</span>
+          <span class="abs-tag">CPT</span>
+          <span class="abs-tag">N = 40</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="mini">
+  <div class="footer__wrap">
+    <span>kogniLAB · UMK × UW · 2025/2026</span>
+    <span class="lang-pl">Wariant B — granatowy editorial · sekcja: landing</span>
+    <span class="lang-en">Variant B — deep-blue editorial · section: landing</span>
+  </div>
+</footer>
+
+<script src="eeg.js"></script>
+<script src="report.js"></script>
+</body>
+</html>

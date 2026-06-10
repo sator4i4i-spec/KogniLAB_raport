@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="pl" data-lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>kogniLAB · FOMO/EEG — Raport interaktywny</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --umk-blue:#034EA1;
+  --navy:#04203f;
+  --navy-2:#06346a;
+  --navy-3:#082d58;
+  --gold:#FFCD00;
+  --gold-deep:#ffd84a;
+  --paper:#f5f7fa;
+  --white:#ffffff;
+  --ink:#13233b;
+  --ink-soft:#43566f;
+  --line-d:rgba(255,255,255,.13);
+  --line-l:#e2e8f1;
+  --txt-d:#eaf1fb;
+  --txt-d-soft:#a9c2e2;
+  --serif:"Source Serif 4",Georgia,serif;
+  --sans:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --maxw:1180px;
+  --r:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--txt-d);background:var(--navy);-webkit-font-smoothing:antialiased;line-height:1.55}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+/* ── language ── */
+.lang-en{display:none}
+html[data-lang="en"] .lang-pl{display:none}
+html[data-lang="en"] .lang-en{display:revert}
+
+/* ── NAV ── */
+.nav{position:sticky;top:0;z-index:50;background:rgba(4,32,63,.82);backdrop-filter:saturate(140%) blur(14px);border-bottom:1px solid var(--line-d)}
+.nav__inner{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;gap:18px;padding:12px 24px}
+.brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.brand__mark{width:28px;height:28px;border-radius:50%;background:#fff;display:grid;place-items:center;position:relative}
+.brand__mark::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--gold)}
+.brand__mark::before{content:"";position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:#fff;border:2px solid var(--navy)}
+.brand__txt{display:flex;flex-direction:column;line-height:1}
+.brand__name{font-weight:700;font-size:14px;color:#fff}
+.brand__name b{color:var(--gold)}
+.brand__sub{font-family:var(--mono);font-size:9px;letter-spacing:.16em;color:var(--txt-d-soft);text-transform:uppercase;margin-top:2px}
+.nav__links{display:flex;align-items:center;gap:1px;flex:1;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12px,#000 calc(100% - 12px),transparent)}
+.nav__links::-webkit-scrollbar{display:none}
+.nav__link{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:12px;font-weight:500;color:var(--txt-d-soft);padding:6px 9px;border-radius:6px;transition:.16s}
+.nav__link:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nav__link.is-active{color:var(--navy);background:var(--gold)}
+.nav__link.is-active i{color:var(--navy)}
+.nav__link i{font-family:var(--mono);font-size:10px;font-style:normal;color:var(--gold);font-weight:600}
+.nav__tools{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.langtog{display:flex;border:1px solid var(--line-d);border-radius:7px;overflow:hidden;font-family:var(--mono)}
+.langtog button{font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.04em;padding:5px 10px;background:transparent;border:none;color:var(--txt-d-soft);cursor:pointer;transition:.15s}
+.langtog button[aria-pressed="true"]{background:var(--gold);color:var(--navy)}
+
+/* ── HERO ── */
+.hero{position:relative;overflow:hidden;text-align:center;background:radial-gradient(120% 90% at 50% -10%,#0a437f 0%,#06346a 38%,#04203f 78%)}
+#eeg{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;opacity:.9}
+.hero__fade{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(80% 60% at 50% 42%,rgba(4,32,63,0) 0%,rgba(4,32,63,.35) 70%,rgba(4,32,63,.7) 100%)}
+.hero__inner{position:relative;z-index:2;max-width:980px;margin:0 auto;padding:70px 28px 58px;display:flex;flex-direction:column;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(255,205,0,.4);border-radius:100px;padding:7px 15px;background:rgba(255,205,0,.06)}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px rgba(255,205,0,.22)}
+h1.title{font-family:var(--serif);font-weight:600;letter-spacing:-.02em;font-size:clamp(34px,5.6vw,68px);line-height:1.08;margin:24px 0 0;max-width:16ch;color:#fff;text-wrap:balance}
+h1.title .fomo{color:var(--gold)}
+.subtitle{font-family:var(--serif);font-size:clamp(17px,2vw,22px);line-height:1.5;color:var(--txt-d-soft);max-width:50ch;margin:28px auto 0}
+.meta-row{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px 14px;margin-top:26px}
+.meta__item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--txt-d)}
+.meta__item .k{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-d-soft)}
+.meta__item .v{font-weight:600;color:#fff}
+.meta__sep{width:1px;height:14px;background:var(--line-d)}
+.hook{margin-top:50px;width:100%;max-width:860px;border-top:1px solid var(--line-d);border-bottom:1px solid var(--line-d);padding:30px 0;display:grid;grid-template-columns:auto 1fr;gap:36px;align-items:center;text-align:left}
+.hook__num{font-family:var(--serif);font-weight:700;line-height:.82;font-size:clamp(80px,14vw,150px);letter-spacing:-.04em;color:var(--gold);text-shadow:0 0 40px rgba(255,205,0,.25);padding-right:10px}
+.hook__num sup{font-size:.38em;font-weight:600;margin-top:.28em;color:#fff;opacity:.8}
+.hook__body p{font-size:16px;line-height:1.52;color:var(--txt-d);max-width:40ch}
+.hook__body p b{color:#fff}
+.hook__body .src{display:block;margin-top:10px;font-family:var(--mono);font-size:10.5px;color:var(--txt-d-soft);letter-spacing:.02em}
+.scrollcue{display:flex;align-items:center;gap:10px;margin-top:38px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--txt-d-soft)}
+.scrollcue .line{width:44px;height:1px;background:var(--txt-d-soft);position:relative;overflow:hidden}
+.scrollcue .line::after{content:"";position:absolute;inset:0;width:40%;background:var(--gold);animation:slide 1.9s ease-in-out infinite}
+@keyframes slide{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
+
+/* ── SECTION WRAPPERS ── */
+.sec-dark{background:var(--navy);color:var(--txt-d)}
+.sec-dark-2{background:var(--navy-3);color:var(--txt-d)}
+.sec-light{background:var(--white);color:var(--ink);border-top:3px solid var(--gold)}
+.sec-paper{background:var(--paper);color:var(--ink)}
+.sec-wrap{max-width:var(--maxw);margin:0 auto;padding:70px 28px}
+.sec-wrap--narrow{max-width:860px}
+
+/* ── SECTION HEADER ── */
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:36px}
+.sec-head .no{font-family:var(--mono);font-size:12px;font-weight:600}
+.sec-head .no--gold{color:var(--gold)}
+.sec-head .no--blue{color:#c79a00}
+.sec-head h2{font-family:var(--serif);font-weight:600;font-size:clamp(22px,2.8vw,30px);letter-spacing:-.01em}
+.sec-head h2.light{color:var(--ink)}
+.sec-head .rule-d{flex:1;height:1px;background:rgba(255,255,255,.1)}
+.sec-head .rule-l{flex:1;height:1px;background:#e2e8f1}
+
+/* ── ABSTRACT ── */
+.abs-grid{display:grid;grid-template-columns:1.05fr 1.35fr;gap:46px;align-items:start}
+@media(max-width:860px){.abs-grid{grid-template-columns:1fr;gap:28px}}
+.tldr__label{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.tldr__label::before{content:"";width:20px;height:2px;background:var(--gold)}
+.tldr{display:flex;flex-direction:column;gap:12px}
+.tldr__item{display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:start;background:rgba(255,255,255,.05);border:1px solid var(--line-d);border-radius:13px;padding:15px 17px}
+.tldr__ico{width:32px;height:32px;border-radius:8px;background:rgba(255,205,0,.12);border:1px solid rgba(255,205,0,.2);display:grid;place-items:center;color:var(--gold);flex-shrink:0}
+.tldr__ico svg{width:16px;height:16px}
+.tldr__item h3{font-size:13px;font-weight:700;margin-bottom:2px;color:#fff}
+.tldr__item p{font-size:13px;color:var(--txt-d-soft);line-height:1.44}
+.tldr__item .em{color:var(--gold);font-weight:600}
+.abs-full{font-family:var(--serif)}
+.abs-lead{font-size:18px;line-height:1.62;color:var(--txt-d);font-weight:500}
+.abs-lead b{color:var(--gold)}
+.abs-more{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.4,0,.2,1)}
+.abs-more__inner{padding-top:16px}
+.abs-full p{font-size:15.5px;line-height:1.66;color:var(--txt-d-soft);margin-top:14px}
+.abs-full p b{color:var(--txt-d)}
+.abs-toggle{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--navy);background:var(--gold);border:none;border-radius:100px;padding:9px 16px;cursor:pointer;transition:.18s}
+.abs-toggle:hover{background:var(--gold-deep)}
+.abs-toggle .chev{transition:transform .35s;display:grid;place-items:center}
+.abs-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.abs-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:22px}
+.abs-tag{font-family:var(--mono);font-size:10.5px;color:var(--txt-d-soft);border:1px solid var(--line-d);border-radius:6px;padding:4px 9px;background:rgba(255,255,255,.04)}
+.abs-tag b{color:var(--gold)}
+
+/* ── INTRO CARDS ── */
+.intro-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:32px}
+@media(max-width:780px){.intro-grid{grid-template-columns:1fr}}
+.stat-card{background:rgba(255,255,255,.05);border:1px solid var(--line-d);border-radius:var(--r);padding:24px}
+.stat-card__num{font-family:var(--serif);font-weight:700;font-size:48px;color:var(--gold);line-height:1;letter-spacing:-.03em}
+.stat-card__num sup{font-size:.4em}
+.stat-card__label{font-size:14px;color:var(--txt-d);margin-top:8px;line-height:1.45}
+.stat-card__src{font-family:var(--mono);font-size:10px;color:var(--txt-d-soft);margin-top:8px;letter-spacing:.02em}
+.prose{font-family:var(--serif);font-size:17px;line-height:1.68;color:var(--txt-d-soft)}
+.prose b{color:var(--txt-d)}
+.prose p+p{margin-top:16px}
+.prose-cols{display:grid;grid-template-columns:1fr 1fr;gap:36px}
+@media(max-width:720px){.prose-cols{grid-template-columns:1fr}}
+
+/* ── HYPOTHESES ── */
+.hyp-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px}
+@media(max-width:700px){.hyp-grid{grid-template-columns:1fr}}
+.hyp-card{background:rgba(255,255,255,.04);border:1px solid var(--line-d);border-radius:var(--r);padding:28px;position:relative;overflow:hidden}
+.hyp-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold)}
+.hyp-card__tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.hyp-card h3{font-family:var(--serif);font-size:20px;font-weight:600;color:#fff;margin-bottom:10px;line-height:1.2}
+.hyp-card p{font-size:14px;color:var(--txt-d-soft);line-height:1.55}
+.hyp-card .measure{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--navy);background:var(--gold);border-radius:6px;padding:5px 10px}
+.rq-box{background:rgba(255,205,0,.06);border:1px solid rgba(255,205,0,.25);border-radius:var(--r);padding:26px 30px;margin-bottom:28px}
+.rq-box__label{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.rq-box p{font-family:var(--serif);font-size:18px;line-height:1.56;color:#fff}
+.rq-box p em{color:var(--gold);font-style:normal;font-weight:600}
+
+/* ── METHODOLOGY ── */
+.method-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+@media(max-width:800px){.method-grid{grid-template-columns:1fr}}
+.equip-list{display:flex;flex-direction:column;gap:12px}
+.equip-item{display:grid;grid-template-columns:38px 1fr;gap:14px;align-items:start;background:rgba(255,255,255,.04);border:1px solid var(--line-d);border-radius:12px;padding:16px}
+.equip-item__ico{width:38px;height:38px;border-radius:9px;background:rgba(255,205,0,.1);border:1px solid rgba(255,205,0,.2);display:grid;place-items:center;color:var(--gold);flex-shrink:0}
+.equip-item__ico svg{width:18px;height:18px}
+.equip-item h4{font-size:14px;font-weight:600;color:#fff;margin-bottom:3px}
+.equip-item p{font-size:12.5px;color:var(--txt-d-soft);line-height:1.44}
+.proc-steps{display:flex;flex-direction:column;gap:0}
+.proc-step{display:grid;grid-template-columns:32px 1fr;gap:14px;padding:16px 0;border-bottom:1px solid var(--line-d)}
+.proc-step:last-child{border-bottom:none}
+.proc-step__n{width:32px;height:32px;border-radius:50%;background:var(--gold);color:var(--navy);font-family:var(--mono);font-size:13px;font-weight:700;display:grid;place-items:center;flex-shrink:0}
+.proc-step h4{font-size:14px;font-weight:600;color:#fff;margin-bottom:4px}
+.proc-step p{font-size:13px;color:var(--txt-d-soft);line-height:1.5}
+
+/* ── IFRAME EMBED ── */
+.embed-box{border:1px solid var(--line-d);border-radius:var(--r);overflow:hidden;margin-top:28px}
+.embed-box__label{background:rgba(255,205,0,.08);border-bottom:1px solid var(--line-d);padding:12px 18px;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.embed-box__label .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.embed-box iframe{display:block;width:100%;border:none}
+
+/* ── BUDGET ── */
+.budget-table{width:100%;border-collapse:collapse;font-size:14px}
+.budget-table th{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--txt-d-soft);padding:10px 16px;text-align:left;border-bottom:1px solid var(--line-d)}
+.budget-table td{padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--txt-d);vertical-align:top}
+.budget-table td:last-child{font-family:var(--mono);font-weight:600;text-align:right;white-space:nowrap;color:#fff}
+.budget-table tr:hover td{background:rgba(255,255,255,.03)}
+.budget-table .total td{border-top:2px solid var(--gold);font-weight:700;color:#fff}
+.budget-table .total td:last-child{color:var(--gold);font-size:16px}
+.budget-note{display:flex;align-items:center;gap:8px;margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--txt-d-soft);padding:12px 16px;background:rgba(255,205,0,.06);border:1px solid rgba(255,205,0,.2);border-radius:10px}
+
+/* ── TEAM ── */
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:900px){.team-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.team-grid{grid-template-columns:1fr}}
+.team-card{background:rgba(255,255,255,.04);border:1px solid var(--line-d);border-radius:var(--r);padding:22px}
+.team-card__avatar{width:44px;height:44px;border-radius:50%;background:var(--gold);color:var(--navy);font-family:var(--mono);font-size:16px;font-weight:700;display:grid;place-items:center;margin-bottom:14px}
+.team-card__role{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.team-card h3{font-size:15px;font-weight:600;color:#fff;margin-bottom:8px}
+.team-card p{font-size:13px;color:var(--txt-d-soft);line-height:1.5}
+
+/* ── TIMELINE ── */
+.timeline{display:flex;flex-direction:column;gap:0;position:relative;margin-top:8px}
+.timeline::before{content:"";position:absolute;left:22px;top:24px;bottom:24px;width:2px;background:rgba(255,205,0,.2)}
+.tl-item{display:grid;grid-template-columns:46px 1fr;gap:18px;align-items:start;padding:16px 0}
+.tl-dot{width:46px;height:46px;border-radius:50%;background:rgba(255,205,0,.1);border:2px solid rgba(255,205,0,.35);display:grid;place-items:center;flex-shrink:0;position:relative;z-index:1}
+.tl-dot span{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--gold);text-align:center;line-height:1.1}
+.tl-content{padding-top:10px}
+.tl-content__tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-d-soft);margin-bottom:5px}
+.tl-content h3{font-size:16px;font-weight:600;color:#fff;margin-bottom:6px}
+.tl-content p{font-size:13.5px;color:var(--txt-d-soft);line-height:1.52}
+.tl-tasks{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tl-task{font-family:var(--mono);font-size:10.5px;color:var(--txt-d-soft);border:1px solid var(--line-d);border-radius:5px;padding:3px 8px;background:rgba(255,255,255,.03)}
+
+/* ── GLOSSARY ── */
+.glossary{display:flex;flex-direction:column;gap:2px}
+.glos-item{border:1px solid var(--line-d);border-radius:10px;overflow:hidden}
+.glos-trigger{width:100%;display:flex;align-items:center;gap:14px;padding:16px 18px;background:rgba(255,255,255,.03);border:none;cursor:pointer;text-align:left;font-family:var(--sans);transition:background .15s}
+.glos-trigger:hover{background:rgba(255,255,255,.06)}
+.glos-trigger[aria-expanded="true"]{background:rgba(255,205,0,.08)}
+.glos-trigger__term{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--gold);min-width:80px}
+.glos-trigger__short{font-size:14px;color:var(--txt-d);flex:1}
+.glos-trigger__chev{margin-left:auto;transition:transform .3s;color:var(--txt-d-soft);flex-shrink:0}
+.glos-trigger[aria-expanded="true"] .glos-trigger__chev{transform:rotate(180deg)}
+.glos-body{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1)}
+.glos-body__inner{padding:4px 18px 18px 18px;border-top:1px solid var(--line-d);font-size:14px;color:var(--txt-d-soft);line-height:1.6}
+.glos-body__inner b{color:var(--txt-d)}
+
+/* ── BIBLIOGRAPHY ── */
+.bib-list{display:flex;flex-direction:column;gap:14px;counter-reset:bib}
+.bib-item{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:baseline;counter-increment:bib}
+.bib-item::before{content:counter(bib);font-family:var(--mono);font-size:11px;font-weight:600;color:var(--gold);text-align:right;padding-top:1px}
+.bib-item p{font-size:13.5px;color:var(--txt-d-soft);line-height:1.62}
+.bib-item a{color:var(--gold);text-decoration:underline;text-underline-offset:2px;word-break:break-all}
+
+/* ── FOMO QUIZ ── */
+.quiz-intro{font-family:var(--serif);font-size:17px;line-height:1.62;color:var(--txt-d-soft);margin-bottom:28px}
+.quiz-intro b{color:var(--txt-d)}
+.quiz-questions{display:flex;flex-direction:column;gap:16px}
+.quiz-q{background:rgba(255,255,255,.04);border:1px solid var(--line-d);border-radius:13px;padding:20px}
+.quiz-q__text{font-size:14.5px;color:var(--txt-d);margin-bottom:14px;line-height:1.5}
+.quiz-q__text span{font-family:var(--mono);font-size:11px;color:var(--txt-d-soft);margin-right:8px}
+.likert{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.likert__labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--txt-d-soft);margin-top:6px;gap:4px}
+.likert label{flex:1;min-width:36px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.likert input{display:none}
+.likert__btn{width:100%;height:36px;border-radius:8px;border:1.5px solid var(--line-d);background:transparent;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--txt-d-soft);display:flex;align-items:center;justify-content:center;transition:.15s;cursor:pointer}
+.likert input:checked + .likert__btn{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+.likert label:hover .likert__btn{border-color:var(--gold);color:var(--gold)}
+.quiz-result{display:none;background:rgba(255,205,0,.08);border:1px solid rgba(255,205,0,.3);border-radius:var(--r);padding:26px;margin-top:24px;text-align:center}
+.quiz-result.show{display:block}
+.quiz-result__score{font-family:var(--serif);font-size:56px;font-weight:700;color:var(--gold);line-height:1}
+.quiz-result__label{font-size:20px;font-weight:600;color:#fff;margin-top:6px}
+.quiz-result__desc{font-size:14px;color:var(--txt-d-soft);margin-top:10px;max-width:46ch;margin-left:auto;margin-right:auto;line-height:1.55}
+.quiz-btn{display:inline-flex;align-items:center;gap:8px;margin-top:20px;font-family:var(--sans);font-size:14px;font-weight:600;color:var(--navy);background:var(--gold);border:none;border-radius:100px;padding:11px 22px;cursor:pointer;transition:.18s}
+.quiz-btn:hover{background:var(--gold-deep)}
+
+/* ── ABOUT REPORT ── */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+@media(max-width:700px){.about-grid{grid-template-columns:1fr}}
+.about-card{background:rgba(255,255,255,.04);border:1px solid var(--line-d);border-radius:var(--r);padding:24px}
+.about-card h3{font-size:16px;font-weight:600;color:#fff;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.about-card p{font-size:13.5px;color:var(--txt-d-soft);line-height:1.56}
+
+/* ── FOOTER ── */
+footer{background:var(--navy-2);border-top:1px solid var(--line-d)}
+.footer__wrap{max-width:var(--maxw);margin:0 auto;padding:24px 28px 48px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-family:var(--mono);font-size:10.5px;color:var(--txt-d-soft);letter-spacing:.03em}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .hook{grid-template-columns:1fr;gap:16px}
+  .hook__num{font-size:72px;padding-right:0}
+  .sec-wrap{padding:48px 18px}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ NAV ════════════════════ -->
+<nav class="nav" aria-label="Nawigacja główna">
+  <div class="nav__inner">
+    <a class="brand" href="#hero">
+      <span class="brand__mark"></span>
+      <span class="brand__txt">
+        <span class="brand__name">kogni<b>LAB</b></span>
+        <span class="brand__sub">UMK · EEG</span>
+      </span>
+    </a>
+    <div class="nav__links" id="navLinks">
+      <a class="nav__link" href="#hero"><i>00</i><span class="lang-pl">Start</span><span class="lang-en">Home</span></a>
+      <a class="nav__link" href="#wprowadzenie"><i>01</i><span class="lang-pl">Wprowadzenie</span><span class="lang-en">Intro</span></a>
+      <a class="nav__link" href="#cel"><i>02</i><span class="lang-pl">Cel</span><span class="lang-en">Aim</span></a>
+      <a class="nav__link" href="#metodologia"><i>03</i><span class="lang-pl">Metodologia</span><span class="lang-en">Methods</span></a>
+      <a class="nav__link" href="#wyniki"><i>04</i><span class="lang-pl">Wyniki</span><span class="lang-en">Results</span></a>
+      <a class="nav__link" href="#budzet"><i>05</i><span class="lang-pl">Budżet</span><span class="lang-en">Budget</span></a>
+      <a class="nav__link" href="#zespol"><i>06</i><span class="lang-pl">Zespół</span><span class="lang-en">Team</span></a>
+      <a class="nav__link" href="#harmonogram"><i>07</i><span class="lang-pl">Harmonogram</span><span class="lang-en">Timeline</span></a>
+      <a class="nav__link" href="#slownik"><i>08</i><span class="lang-pl">Słownik</span><span class="lang-en">Glossary</span></a>
+      <a class="nav__link" href="#bibliografia"><i>09</i><span class="lang-pl">Bibliografia</span><span class="lang-en">Refs</span></a>
+      <a class="nav__link" href="#quiz"><i>10</i><span class="lang-pl">Test FOMO</span><span class="lang-en">FOMO Test</span></a>
+    </div>
+    <div class="nav__tools">
+      <div class="langtog" role="group" aria-label="Język / Language">
+        <button data-lang="pl" aria-pressed="true">PL</button>
+        <button data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════════════════ HERO ════════════════════ -->
+<header class="hero" id="hero">
+  <canvas id="eeg"></canvas>
+  <div class="hero__fade"></div>
+  <div class="hero__inner">
+    <span class="eyebrow">
+      <span class="dot"></span>
+      <span class="lang-pl">Projekt badawczy · Kognitywistyka · UMK</span>
+      <span class="lang-en">Research project · Cognitive Science · UMK</span>
+    </span>
+    <h1 class="title">
+      <span class="lang-pl">Neuronalne i behawioralne korelaty <span class="fomo">FOMO</span></span>
+      <span class="lang-en">Neural &amp; behavioral correlates of <span class="fomo">FOMO</span></span>
+    </h1>
+    <p class="subtitle">
+      <span class="lang-pl">Badanie EEG mierzące reakcję mózgu na dźwięki powiadomień u osób o wysokim i niskim lęku przed pominięciem — gdy telefon jest poza zasięgiem.</span>
+      <span class="lang-en">An EEG study measuring the brain's response to notification sounds in high vs. low FOMO individuals — when the phone is out of reach.</span>
+    </p>
+    <div class="meta-row">
+      <span class="meta__item"><span class="k">Autor</span><span class="v">D. Satora-Izquierdo</span></span>
+      <span class="meta__sep"></span>
+      <span class="meta__item"><span class="k">Uczelnia</span><span class="v">UMK Toruń</span></span>
+      <span class="meta__sep"></span>
+      <span class="meta__item"><span class="k">Rok</span><span class="v">2025/2026</span></span>
+      <span class="meta__sep"></span>
+      <span class="meta__item"><span class="k">Metoda</span><span class="v">EEG 64-ch · P300 · FAA</span></span>
+    </div>
+    <div class="hook">
+      <div class="hook__num">69<sup>%</sup></div>
+      <div class="hook__body">
+        <p>
+          <span class="lang-pl">młodych użytkowników mediów społecznościowych w USA doświadcza <b>FOMO</b> — lęku przed pominięciem. To już nie niszowy problem, lecz powszechny mechanizm kognitywny.</span>
+          <span class="lang-en">of young social-media users in the US experience <b>FOMO</b> — the fear of missing out. No longer a niche issue, but a widespread cognitive mechanism.</span>
+        </p>
+        <span class="src">Bartosiak i in., 2025 · PLOS ONE</span>
+      </div>
+    </div>
+    <div class="scrollcue">
+      <span class="line"></span>
+      <span class="lang-pl">Przewiń w dół</span><span class="lang-en">Scroll down</span>
+    </div>
+  </div>
+</header>
+
+<!-- ════════════════════ ABSTRACT ════════════════════ -->
+<section class="sec-dark" id="abstract">
+  <div class="sec-wrap">
+    <div class="sec-head">
+      <span class="no no--gold">00</span>
+      <h2><span class="lang-pl">Streszczenie</span><span class="lang-en">Abstract</span></h2>
+      <span class="rule-d"></span>
+    </div>
+    <div class="abs-grid">
+      <div>
+        <div class="tldr__label"><span class="lang-pl">W 15 sekund</span><span class="lang-en">In 15 seconds</span></div>
+        <div class="tldr">
+          <div class="tldr__item">
+            <span class="tldr__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.3-4.3"/></svg></span>
+            <div>
+              <h3><span class="lang-pl">Pytanie</span><span class="lang-en">Question</span></h3>
+              <p><span class="lang-pl">Jak mózg reaguje na <span class="em">dźwięk powiadomienia</span>, gdy nie wolno sprawdzić telefonu?</span><span class="lang-en">How does the brain react to a <span class="em">notification sound</span> when checking the phone is forbidden?</span></p>
+            </div>
+          </div>
+          <div class="tldr__item">
+            <span class="tldr__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h3l2-7 4 14 2-7h7"/></svg></span>
+            <div>
+              <h3><span class="lang-pl">Metoda</span><span class="lang-en">Method</span></h3>
+              <p><span class="lang-pl">EEG 64-kanałowy, <span class="em">N = 40</span> (wysokie vs niskie FOMO). Wskaźniki: fala P300 i asymetria czołowa alfa (FAA).</span><span class="lang-en">64-channel EEG, <span class="em">N = 40</span> (high vs low FOMO). Markers: P300 wave and frontal alpha asymmetry (FAA).</span></p>
+            </div>
+          </div>
+          <div class="tldr__item">
+            <span class="tldr__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v3M12 18v3M5 12H2M22 12h-3M6 6l-2-2M20 20l-2-2M18 6l2-2M4 20l2-2"/><circle cx="12" cy="12" r="3.4"/></svg></span>
+            <div>
+              <h3><span class="lang-pl">Hipoteza</span><span class="lang-en">Hypothesis</span></h3>
+              <p><span class="lang-pl">Wysokie FOMO = <span class="em">silniejsza i nieustępująca</span> reakcja: większa P300, spadek mocy alfa w lewej korze czołowej.</span><span class="lang-en">High FOMO = a <span class="em">stronger, non-habituating</span> response: larger P300, drop in left-frontal alpha power.</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="abs-full">
+        <p class="abs-lead">
+          <span class="lang-pl">Lęk przed pominięciem (FOMO) stał się powszechnym zjawiskiem kognitywnym. Dotychczasowe badania opierały się na kwestionariuszach — ten projekt używa <b>EEG o rozdzielczości milisekundowej</b>, by obiektywnie zmierzyć reakcję mózgu na dźwiękowe powiadomienia.</span>
+          <span class="lang-en">The fear of missing out (FOMO) has become a widespread cognitive phenomenon. Prior research relied on questionnaires — this project uses <b>millisecond-resolution EEG</b> to objectively measure the brain's response to notification sounds.</span>
+        </p>
+        <div class="abs-more" id="absMore" aria-hidden="true">
+          <div class="abs-more__inner">
+            <p><span class="lang-pl">W badaniu weźmie udział 40 osób w wieku 18–25 lat (metoda doboru skrajnego): 20 z wysokim i 20 z niskim FOMO. Podczas zadania ciągłego wykonania (CPT) rejestrowany jest 64-kanałowy sygnał EEG, a w tle losowo emitowane są trzy typy bodźców: kluczowy (indywidualny dźwięk powiadomienia uczestnika), neutralny (ton systemowy) i kontrolny (dźwięk natury).</span><span class="lang-en">Forty participants aged 18–25 are selected by extreme-groups sampling: 20 with high and 20 with low FOMO. During a continuous performance task (CPT), 64-channel EEG is recorded while three sound types play at random: key (participant's own notification), neutral (system tone) and control (nature sound).</span></p>
+            <p><span class="lang-pl">Analizie poddane zostaną: amplituda fali <b>P300</b> (odpowiedź orientacyjna) oraz <b>asymetria czołowa alfa (FAA)</b> jako marker pobudzenia. Oczekujemy silniejszego spadku mocy alfa w lewej korze czołowej i wyższej, niehabituującej P300 u grupy High-FOMO.</span><span class="lang-en">Two markers are analysed: <b>P300</b> amplitude (orienting response) and <b>frontal alpha asymmetry (FAA)</b> as an arousal marker. We expect a stronger drop in left-frontal alpha and a larger, non-habituating P300 in the High-FOMO group.</span></p>
+          </div>
+        </div>
+        <button class="abs-toggle" id="absToggle" aria-expanded="false" aria-controls="absMore">
+          <span id="absTxt"><span class="lang-pl">Czytaj pełny abstrakt</span><span class="lang-en">Read full abstract</span></span>
+          <span class="chev"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg></span>
+        </button>
+        <div class="abs-tags" style="margin-top:20px">
+          <span class="abs-tag">FOMO</span>
+          <span class="abs-tag">EEG · 64-ch</span>
+          <span class="abs-tag"><b>P300</b></span>
+          <span class="abs-tag">FAA</span>
+          <span class="abs-tag">CPT</span>
+          <span class="abs-tag">N = 40</span>
+          <span class="abs-tag">Brain Products</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 01 WPROWADZENIE ════════════════════ -->
+<section class="sec-light" id="wprowadzenie">
+  <div class="sec-wrap">
+    <div class="sec-head">
+      <span class="no no--blue">01</span>
+      <h2 class="light"><span class="lang-pl">Wprowadzenie</span><span class="lang-en">Introduction</span></h2>
+      <span class="rule-l"></span>
+    </div>
+    <div class="intro-grid">
+      <div class="stat-card" style="background:#f5f8ff;border-color:#d8e4f8">
+        <div class="stat-card__num" style="color:#034EA1">69<sup>%</sup></div>
+        <div class="stat-card__label" style="color:#43566f"><b style="color:#13233b">Młodych użytkowników SM</b> w USA doświadcza FOMO regularnie.</div>
+        <div class="stat-card__src" style="color:#8fa8c8">Bartosiak i in., 2025 · PLOS ONE</div>
+      </div>
+      <div class="stat-card" style="background:#f5f8ff;border-color:#d8e4f8">
+        <div class="stat-card__num" style="color:#034EA1">P300</div>
+        <div class="stat-card__label" style="color:#43566f"><b style="color:#13233b">Składowa ERP</b> mierzona EEG — obiektywny wskaźnik reakcji poznawczej na bodziec.</div>
+        <div class="stat-card__src" style="color:#8fa8c8">Metoda milisekundowej precyzji</div>
+      </div>
+      <div class="stat-card" style="background:#f5f8ff;border-color:#d8e4f8">
+        <div class="stat-card__num" style="color:#034EA1">FAA</div>
+        <div class="stat-card__label" style="color:#43566f"><b style="color:#13233b">Asymetria czołowa alfa</b> — marker frustracji i gotowości do działania wykrywany EEG.</div>
+        <div class="stat-card__src" style="color:#8fa8c8">Elektrody F3 / F4</div>
+      </div>
+    </div>
+    <div class="prose-cols" style="margin-top:36px;color:var(--ink-soft)">
+      <div class="prose" style="color:var(--ink-soft)">
+        <p><b style="color:var(--ink)">Zjawisko FOMO</b> to reakcja emocjonalna — lęk przed pominięciem osobistego lub publicznego doświadczenia, które mogłoby pomóc jednostce utrzymać lub poprawić jej życie społeczne (Saygın &amp; Karadal, 2022). Algorytmy mediów społecznościowych aktywnie <b style="color:var(--ink)">wykorzystują ten mechanizm</b> jako narzędzie marketingowe napędzające kompulsywną konsumpcję (Alfina i in., 2023).</p>
+        <p>FOMO rodzi poważne problemy: przewlekły lęk, stres i stany depresyjne. Kompulsywne sprawdzanie telefonu obniża koncentrację i prowadzi do chronicznych zaburzeń snu (Ellahi i in., 2021). Negatywnie oddziałuje też na relacje interpersonalne — wirtualność kosztem kontaktu bezpośredniego (Peleg &amp; Boniel-Nissim, 2024).</p>
+      </div>
+      <div class="prose" style="color:var(--ink-soft)">
+        <p>Dotychczasowe badania nad FOMO opierały się <b style="color:var(--ink)">głównie na metodach kwestionariuszowych</b> (Przybylski i in., 2013). Brakuje obiektywnych, neurobiologicznych danych o tym, co dzieje się w mózgu w momencie usłyszenia dźwięku powiadomienia.</p>
+        <p>Metoda <b style="color:var(--ink)">EEG</b> pozwala rejestrować aktywność mózgu z rozdzielczością milisekundową, umożliwiając precyzyjny pomiar reakcji neuronalnych. Badania potwierdzają, że wysokie nasilenie FOMO obniża sprawność samokontroli i mediuje kompulsywne zachowania (Takács &amp; Seregély, 2025; Wang i in., 2023).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 02 CEL I HIPOTEZY ════════════════════ -->
+<section class="sec-dark-2" id="cel">
+  <div class="sec-wrap">
+    <div class="sec-head">
+      <span class="no no--gold">02</span>
+      <h2><span class="lang-pl">Cel i hipotezy</span><span class="lang-en">Aim &amp; Hypotheses</span></h2>
+      <span class="rule-d"></span>
+    </div>
+    <div class="rq-box">
+      <div class="rq-box__label"><span class="lang-pl">Pytanie badawcze</span><span class="lang-en">Research question</span></div>
+      <p>
+        <span class="lang-pl">Jak znane <em>dźwiękowe powiadomienia z mediów społecznościowych</em> wpływają na aktywność bioelektryczną mózgu u osób o wysokim i niskim poziomie FOMO, gdy <em>nie mają możliwości sprawdzenia telefonu</em>?</span>
+        <span class="lang-en">How do familiar <em>social-media notification sounds</em> affect the brain's bioelectrical activity in people with high vs. low FOMO, when <em>they cannot check their phone</em>?</span>
+      </p>
+    </div>
+    <div class="hyp-grid">
+      <div class="hyp-card">
+        <div class="hyp-card__tag">H1 · Asymetria czołowa alfa (FAA)</div>
+        <h3><span class="lang-pl">Spadek mocy alfa po lewej stronie</span><span class="lang-en">Left-frontal alpha power drop</span></h3>
+        <p>
+          <span class="lang-pl">Usłyszenie dźwięku wywoła u osób z wysokim FOMO silniejszy spadek mocy fal alfa w lewej korze czołowej (F3) w porównaniu do grupy z niskim FOMO. Niższa moc alfa = wyższe pobudzenie, stan gotowości i frustracji wywołanej brakiem dostępu do telefonu.</span>
+          <span class="lang-en">Hearing the sound will cause a stronger drop in left-frontal alpha power (F3) in high-FOMO individuals. Lower alpha power = higher arousal, action readiness and frustration from being unable to check the phone.</span>
+        </p>
+        <span class="measure">FAA = ln(Moc F4) − ln(Moc F3)</span>
+      </div>
+      <div class="hyp-card">
+        <div class="hyp-card__tag">H2 · Potencjał wywołany P300</div>
+        <h3><span class="lang-pl">Wyższa amplituda bez habituacji</span><span class="lang-en">Higher amplitude, no habituation</span></h3>
+        <p>
+          <span class="lang-pl">Osoby o wysokim FOMO wykażą istotnie wyższą amplitudę fali P300 (elektrody Pz, Cz, okno 300–500 ms) i brak habituacji przy kolejnych powtórzeniach sygnału. U osób z niskim FOMO reakcja będzie umiarkowana i będzie słabła.</span>
+          <span class="lang-en">High-FOMO individuals will show significantly higher P300 amplitude (electrodes Pz, Cz, 300–500 ms window) and no habituation across repetitions. Low-FOMO individuals will show a moderate, declining response.</span>
+        </p>
+        <span class="measure">Pz · Cz · 300–500 ms</span>
+      </div>
+    </div>
+    <div style="margin-top:20px;padding:16px 20px;background:rgba(255,255,255,.04);border:1px solid var(--line-d);border-radius:12px;font-size:13.5px;color:var(--txt-d-soft);line-height:1.55">
+      <b style="color:var(--txt-d)">Cel projektu:</b>
+      <span class="lang-pl"> Zbadanie neurobiologicznych mechanizmów FOMO przy użyciu aparatury EEG — precyzyjne określenie, które obszary mózgu i jakie wzorce fal elektrycznych aktywują się pod wpływem cyfrowych bodźców dźwiękowych oraz lęku przed wykluczeniem społecznym.</span>
+      <span class="lang-en"> To investigate the neurobiological mechanisms of FOMO using EEG — precisely identifying which brain regions and electrical wave patterns activate in response to digital sound cues and the fear of social exclusion.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 03 METODOLOGIA ════════════════════ -->
+<section class="sec-dark" id="metodologia">
+  <div class="sec-wrap">
+    <div class="sec-head">
+      <span class="no no--gold">03</span>
+      <h2><span class="lang-pl">Metodologia</span><span class="lang-en">Methodology</span></h2>
+      <span class="rule-d"></span>
+    </div>
+    <div class="method-grid">
+      <div>
+        <p style="font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-d-soft);margin-bottom:14px">
+          <span class="lang-pl">Aparatura i narzędzia</span><span class="lang-en">Equipment &amp; tools</span>
+        </p>
+        <div class="equip-list">
+          <div class="equip-item">
+            <span class="equip-item__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h3l2-7 4 14 2-7h7"/></svg></span>
+            <div><h4>EEG 64-ch · Brain Products</h4><p>actiCAP slim z aktywnymi elektrodami żelowymi, wzmacniacz actiCHamp. Impedancja &lt;5 kΩ, wysoka rozdzielczość przestrzenna.</p></div>
+          </div>
+          <div class="equip-item">
+            <span class="equip-item__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg></span>
+            <div><h4>USB Trigger Box</h4><p>Precyzja znaczników czasowych &lt;1 ms. Synchronizacja dźwięku Bluetooth z zapisem EEG.</p></div>
+          </div>
+          <div class="equip-item">
+            <span class="equip-item__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+            <div><h4>OpenSesame</h4><p>Open-source. Generowanie bodźców dźwiękowych (kluczowy, neutralny, kontrolny) z precyzją czasową.</p></div>
+          </div>
+          <div class="equip-item">
+            <span class="equip-item__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12h6M12 9v6"/><circle cx="12" cy="12" r="9"/></svg></span>
+            <div><h4>Skala FoMOs (Przybylski, 2013)</h4><p>10-itemowy kwestionariusz Likerta (1–5). Selekcja uczestników + zmienna różnicująca w analizie.</p></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p style="font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-d-soft);margin-bottom:14px">
+          <span class="lang-pl">Procedura badawcza</span><span class="lang-en">Research procedure</span>
+        </p>
+        <div class="proc-steps">
+          <div class="proc-step"><span class="proc-step__n">1</span><div><h4>Rekrutacja i selekcja</h4><p>Kwestionariusz FoMOs w większej próbie studentów. Dobór skrajny: 20 najwyższych (Grupa A) + 20 najniższych (Grupa B).</p></div></div>
+          <div class="proc-step"><span class="proc-step__n">2</span><div><h4>Przygotowanie (45–60 min)</h4><p>Zakładanie 64-kanałowego czepka EEG, żel przewodzący, weryfikacja impedancji. Ustalenie indywidualnego dźwięku powiadomienia.</p></div></div>
+          <div class="proc-step"><span class="proc-step__n">3</span><div><h4>Sesja CPT (20 min)</h4><p>Zadanie ciągłego wykonania — reagowanie na literę „X". Zakaz dotykania smartfona. Losowe bodźce dźwiękowe w tle.</p></div></div>
+          <div class="proc-step"><span class="proc-step__n">4</span><div><h4>Analiza EEG</h4><p>Oczyszczanie z artefaktów (mruganie, napięcie mięśniowe). Analiza ERP (P300) i częstotliwościowa (FFA, pasmo α 8–12 Hz).</p></div></div>
+        </div>
+        <div style="margin-top:14px;padding:12px 16px;background:rgba(255,205,0,.06);border:1px solid rgba(255,205,0,.2);border-radius:10px;font-family:var(--mono);font-size:11px;color:var(--txt-d-soft)">
+          <b style="color:var(--gold)">Próba:</b> N = 40 · wiek 18–25 · studenci · SWPS Warszawa (laboratorium EEG)
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive EEG Cap embed -->
+    <div class="embed-box" style="margin-top:36px">
+      <div class="embed-box__label">
+        <span class="dot"></span>
+        <span class="lang-pl">Interaktywny model czepka EEG — układ 10-10 · przeciągnij aby obrócić · kliknij elektrodę po szczegóły</span>
+        <span class="lang-en">Interactive EEG cap model — 10-10 layout · drag to rotate · click electrode for details</span>
+      </div>
+      <iframe
+        src="../03-metodologia/czepek EEG/Czepek EEG.html"
+        height="560"
+        title="Interaktywny model czepka EEG"
+        loading="lazy"
+      ></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 04 WYNIKI ════════════════════ -->
+<section class="sec-dark-2" id="wyniki">
+  <div class="sec-wrap">
+    <div class="sec-head">
+      <span class="no no--gold">04</span>
+      <h2><span class="lang-pl">Oczekiwane wyniki</span><span class="lang-en">Expected Results</span></h2>
+      <span class="rule-d"></span>
+    </div>
+    <div class="prose" style="max-width:72ch;margin-bottom:24px">
+      <p>
+        <span class="lang-pl">Sygnał EEG zostanie oczyszczony z artefaktów ruchowych. Analizie podda się dwa wskaźniki: <b>Potencjały Wywołane (ERP)</b> — amplituda fali P300 w elektrodach Pz i Cz (okno 300–500 ms), oraz <b>Analiza Częstotliwościowa (FT)</b> — gęstość widmowa mocy w paśmie alfa (8–12 Hz) na elektrodach czołowych F3 i F4.</span>
+        <span class="lang-en">The EEG signal will be cleaned of motion artefacts. Two markers will be analysed: <b>Event-Related Potentials (ERP)</b> — P300 amplitude at Pz and Cz (300–500 ms window), and <b>Frequency Analysis (FT)</b> — power spectral density in the alpha band (8–12 Hz) at frontal electrodes F3 and F4.</span>
+      </p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px">
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--line-d);border-radius:12px;padding:20px">
+        <div style="font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">H1 · FAA</div>
+        <p style="font-size:13.5px;color:var(--txt-d-soft);line-height:1.52">Oczekiwana <b style="color:#fff">niższa moc alfa po lewej stronie (F3)</b> u grupy High-FOMO — wyższa aktywacja lewej półkuli jako stan gotowości do działania / frustracji.</p>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--line-d);border-radius:12px;padding:20px">
+        <div style="font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">H2 · P300</div>
+        <p style="font-size:13.5px;color:var(--txt-d-soft);line-height:1.52">Oczekiwana <b style="color:#fff">wyższa amplituda i brak habituacji</b> w grupie High-FOMO. Low-FOMO: odpowiedź umiarkowana, malejąca przy kolejnych blokach.</p>
+      </div>
+    </div>
+
+    <!-- Interactive ERP Chart embed -->
+    <div class="embed-box">
+      <div class="embed-box__label">
+        <span class="dot"></span>
+        <span class="lang-pl">Interaktywny wykres ERP P300 — zmień bodziec/blok/elektrodę · przeciągnij okno pomiarowe</span>
+        <span class="lang-en">Interactive ERP P300 chart — switch stimulus/block/electrode · drag the measurement window</span>
+      </div>
+      <iframe
+        src="../04-wyniki/suwak do wyników/Wykres ERP P300.html"
+        height="720"
+        title="Interaktywny wykres ERP P300"
+        loading="lazy"
+      ></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 05 BUDŻET ════════════════════ -->
+<section class="sec-light" id="budzet">
+  <div class="sec-wrap sec-wrap--narrow">
+    <div class="sec-head">
+      <span class="no no--blue">05</span>
+      <h2 class="light"><span class="lang-pl">Budżet</span><span class="lang-en">Budget</span></h2>
+      <span class="rule-l"></span>
+    </div>
+    <table class="budget-table" style="color:var(--ink)">
+      <thead>
+        <tr>
+          <th style="color:var(--ink-soft)"><span class="lang-pl">Pozycja</span><span class="lang-en">Item</span></th>
+          <th style="color:var(--ink-soft)"><span class="lang-pl">Opcja dostępu</span><span class="lang-en">Access</span></th>
+          <th style="color:var(--ink-soft)"><span class="lang-pl">Koszt</span><span class="lang-en">Cost</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:var(--ink)">System EEG 64ch + wzmacniacz + licencja</td>
+          <td style="color:var(--ink-soft)"><span class="lang-pl">Laboratorium SWPS Warszawa — współpraca</span><span class="lang-en">SWPS Warsaw lab — partnership</span></td>
+          <td style="color:var(--ink)">0 zł</td>
+        </tr>
+        <tr>
+          <td style="color:var(--ink)">USB Trigger Box</td>
+          <td style="color:var(--ink-soft)"><span class="lang-pl">Zasób laboratorium</span><span class="lang-en">Lab resource</span></td>
+          <td style="color:var(--ink)">0 zł</td>
+        </tr>
+        <tr>
+          <td style="color:var(--ink)">OpenSesame</td>
+          <td style="color:var(--ink-soft)">Open source</td>
+          <td style="color:var(--ink)">0 zł</td>
+        </tr>
+        <tr>
+          <td style="color:var(--ink)">Żel ECI Electro-Gel 473 ml (3 słoiki)</td>
+          <td style="color:var(--ink-soft)">e-majer.pl / elmiko.pl</td>
+          <td style="color:var(--ink)">300 zł</td>
+        </tr>
+        <tr>
+          <td style="color:var(--ink)">NuPrep (preparat skórny)</td>
+          <td style="color:var(--ink-soft)">e-majer.pl / elmiko.pl</td>
+          <td style="color:var(--ink)">100 zł</td>
+        </tr>
+        <tr>
+          <td style="color:var(--ink)"><span class="lang-pl">Wynagrodzenie uczestników (50 zł × 40)</span><span class="lang-en">Participant compensation (PLN 50 × 40)</span></td>
+          <td style="color:var(--ink-soft)">—</td>
+          <td style="color:var(--ink)">2 000 zł</td>
+        </tr>
+        <tr>
+          <td style="color:var(--ink)"><span class="lang-pl">Sesje niewypały (50 zł × 5)</span><span class="lang-en">Failed sessions (PLN 50 × 5)</span></td>
+          <td style="color:var(--ink-soft)">—</td>
+          <td style="color:var(--ink)">250 zł</td>
+        </tr>
+        <tr>
+          <td style="color:var(--ink)"><span class="lang-pl">Rezerwa</span><span class="lang-en">Reserve</span></td>
+          <td style="color:var(--ink-soft)">—</td>
+          <td style="color:var(--ink)">500 zł</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="total">
+          <td colspan="2" style="font-weight:700;color:var(--ink)"><span class="lang-pl">ŁĄCZNIE</span><span class="lang-en">TOTAL</span></td>
+          <td>3 150 zł</td>
+        </tr>
+      </tfoot>
+    </table>
+    <div class="budget-note" style="border-color:#d8e4f8;background:#f0f5ff;color:var(--ink-soft)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#034EA1" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <span class="lang-pl">Dostęp do aparatury EEG w ramach współpracy z laboratorium SWPS Warszawa — główny koszt to wynagrodzenia uczestników (64% budżetu).</span>
+      <span class="lang-en">EEG equipment accessed via SWPS Warsaw lab partnership — the main cost is participant compensation (64% of budget).</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 06 ZESPÓŁ ════════════════════ -->
+<section class="sec-dark" id="zespol">
+  <div class="sec-wrap">
+    <div class="sec-head">
+      <span class="no no--gold">06</span>
+      <h2><span class="lang-pl">Zespół badawczy</span><span class="lang-en">Research Team</span></h2>
+      <span class="rule-d"></span>
+    </div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-card__avatar">DS</div>
+        <div class="team-card__role"><span class="lang-pl">Główny badacz</span><span class="lang-en">Lead researcher</span></div>
+        <h3>D. Satora-Izquierdo</h3>
+        <p><span class="lang-pl">Student kognitywistyki UMK, rok 3. Wiedza z psychologii poznawczej i neuronauki, znajomość literatury FOMO, obsługa OpenSesame i podstawy rejestracji EEG.</span><span class="lang-en">3rd-year Cognitive Science student at UMK. Knowledge of cognitive psychology, neuroscience, FOMO literature, OpenSesame and basic EEG recording.</span></p>
+      </div>
+      <div class="team-card">
+        <div class="team-card__avatar" style="background:var(--umk-blue);color:#fff">P</div>
+        <div class="team-card__role"><span class="lang-pl">Promotor / Nadzór merytoryczny</span><span class="lang-en">Supervisor</span></div>
+        <h3><span class="lang-pl">Promotor</span><span class="lang-en">Supervisor</span></h3>
+        <p><span class="lang-pl">Pracownik katedry psychologii lub kognitywistyki UMK. Doświadczenie w badaniach EEG/ERP, uprawnienia do zatwierdzania protokołów etycznych.</span><span class="lang-en">Faculty member, dept. of psychology/cognitive science. Experience in EEG/ERP research, authority to approve ethics protocols.</span></p>
+      </div>
+      <div class="team-card">
+        <div class="team-card__avatar" style="background:#0f9fb0;color:#fff">T</div>
+        <div class="team-card__role"><span class="lang-pl">Wsparcie techniczne</span><span class="lang-en">Technical support</span></div>
+        <h3><span class="lang-pl">Doktorant — EEG</span><span class="lang-en">PhD Candidate — EEG</span></h3>
+        <p><span class="lang-pl">Doświadczenie w obsłudze wielokanałowych systemów EEG Brain Products. Procedury zakładania czepka, żel, weryfikacja impedancji. Udostępnia laboratorium.</span><span class="lang-en">Experience with Brain Products multi-channel EEG systems. Cap fitting, gel application, impedance verification. Provides lab access.</span></p>
+      </div>
+      <div class="team-card">
+        <div class="team-card__avatar" style="background:#2da56c;color:#fff">A</div>
+        <div class="team-card__role"><span class="lang-pl">Analityk danych</span><span class="lang-en">Data analyst</span></div>
+        <h3><span class="lang-pl">Analityk EEG</span><span class="lang-en">EEG Analyst</span></h3>
+        <p><span class="lang-pl">Kompetencje w przetwarzaniu sygnału EEG: MATLAB / Python (EEGLAB / MNE-Python). Usuwanie artefaktów, ICA, uśrednianie ERP.</span><span class="lang-en">Signal processing skills: MATLAB / Python (EEGLAB / MNE-Python). Artefact removal, ICA, ERP averaging.</span></p>
+      </div>
+      <div class="team-card">
+        <div class="team-card__avatar" style="background:#8466c9;color:#fff">S</div>
+        <div class="team-card__role"><span class="lang-pl">Stażysta naukowy</span><span class="lang-en">Research intern</span></div>
+        <h3><span class="lang-pl">Student – staż</span><span class="lang-en">Student – intern</span></h3>
+        <p><span class="lang-pl">Wsparcie na każdym etapie — od rekrutacji uczestników po asystę podczas sesji pomiarowych EEG.</span><span class="lang-en">Support at every stage — from participant recruitment to assisting during EEG measurement sessions.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 07 HARMONOGRAM ════════════════════ -->
+<section class="sec-paper" id="harmonogram">
+  <div class="sec-wrap">
+    <div class="sec-head">
+      <span class="no no--blue">07</span>
+      <h2 class="light"><span class="lang-pl">Harmonogram</span><span class="lang-en">Timeline</span></h2>
+      <span class="rule-l"></span>
+    </div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"><span>M1–2</span></div>
+        <div class="tl-content">
+          <div class="tl-content__tag"><span class="lang-pl">Etap 1 · Przygotowanie</span><span class="lang-en">Phase 1 · Preparation</span></div>
+          <h3 style="color:var(--ink)"><span class="lang-pl">Rekrutacja i kalibracja</span><span class="lang-en">Recruitment &amp; calibration</span></h3>
+          <p style="color:var(--ink-soft)"><span class="lang-pl">Badanie przesiewowe kwestionariuszem FoMOs w próbie ok. 150 studentów. Selekcja 40 uczestników. Kalibracja systemu EEG Brain Products, próbne sesje.</span><span class="lang-en">Screening survey with FoMOs scale in ~150 students. Selection of 40 participants. Brain Products EEG system calibration and pilot sessions.</span></p>
+          <div class="tl-tasks">
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">Kwestionariusz FoMOs</span>
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">Zgody etyczne</span>
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">Kalibracja EEG</span>
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">Pilotaż OpenSesame</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"><span>M2–3</span></div>
+        <div class="tl-content">
+          <div class="tl-content__tag"><span class="lang-pl">Etap 2 · Badania</span><span class="lang-en">Phase 2 · Data collection</span></div>
+          <h3 style="color:var(--ink)"><span class="lang-pl">Sesje pomiarowe EEG</span><span class="lang-en">EEG measurement sessions</span></h3>
+          <p style="color:var(--ink-soft)"><span class="lang-pl">40 sesji indywidualnych (+ rezerwa 5). Zakładanie czepka (45–60 min), 20-minutowe zadanie CPT, rejestracja sygnału. Weryfikacja jakości danych na bieżąco.</span><span class="lang-en">40 individual sessions (+ 5 reserve). Cap fitting (45–60 min), 20-min CPT task, signal recording. Real-time data quality checks.</span></p>
+          <div class="tl-tasks">
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">45 sesji EEG</span>
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">Nagrania dźwięków</span>
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">Kontrola impedancji</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"><span>M3–4</span></div>
+        <div class="tl-content">
+          <div class="tl-content__tag"><span class="lang-pl">Etap 3 · Analiza</span><span class="lang-en">Phase 3 · Analysis</span></div>
+          <h3 style="color:var(--ink)"><span class="lang-pl">Przetwarzanie i analiza danych</span><span class="lang-en">Data processing &amp; analysis</span></h3>
+          <p style="color:var(--ink-soft)"><span class="lang-pl">Oczyszczanie sygnału EEG (EEGLAB / MNE-Python): filtrowanie, ICA, usuwanie artefaktów. Obliczenie amplitudy P300 i wskaźnika FAA. Testy statystyczne: mieszana ANOVA Grupa × Bodziec × Blok.</span><span class="lang-en">EEG signal cleaning (EEGLAB / MNE-Python): filtering, ICA, artefact rejection. Computation of P300 amplitude and FAA index. Statistics: mixed ANOVA Group × Stimulus × Block.</span></p>
+          <div class="tl-tasks">
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">EEGLAB / MNE-Python</span>
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">ICA</span>
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">ERP averaging</span>
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">ANOVA</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"><span>M4–5</span></div>
+        <div class="tl-content">
+          <div class="tl-content__tag"><span class="lang-pl">Etap 4 · Opracowanie</span><span class="lang-en">Phase 4 · Write-up</span></div>
+          <h3 style="color:var(--ink)"><span class="lang-pl">Interpretacja i raportowanie</span><span class="lang-en">Interpretation &amp; reporting</span></h3>
+          <p style="color:var(--ink-soft)"><span class="lang-pl">Interpretacja wyników w kontekście hipotez H1 i H2. Opracowanie wizualizacji danych. Pisanie raportu i przygotowanie manuskryptu.</span><span class="lang-en">Interpreting results in the context of H1 and H2. Data visualisations. Writing the report and preparing the manuscript.</span></p>
+          <div class="tl-tasks">
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">Wizualizacje ERP</span>
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">Raport</span>
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">Manuskrypt</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"><span>M5–6</span></div>
+        <div class="tl-content">
+          <div class="tl-content__tag"><span class="lang-pl">Etap 5 · Dyskusja</span><span class="lang-en">Phase 5 · Dissemination</span></div>
+          <h3 style="color:var(--ink)"><span class="lang-pl">Prezentacja i publikacja</span><span class="lang-en">Presentation &amp; publication</span></h3>
+          <p style="color:var(--ink-soft)"><span class="lang-pl">Prezentacja wyników na seminarium kognitywistyki. Przygotowanie do publikacji. Omówienie implikacji dla interwencji ograniczających negatywne skutki FOMO.</span><span class="lang-en">Presenting results at the cognitive science seminar. Publication preparation. Discussing implications for FOMO-reduction interventions.</span></p>
+          <div class="tl-tasks">
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">Seminarium</span>
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">Peer review</span>
+            <span class="tl-task" style="color:var(--ink-soft);border-color:#d8e4f8">Implikacje kliniczne</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 08 SŁOWNIK ════════════════════ -->
+<section class="sec-dark" id="slownik">
+  <div class="sec-wrap sec-wrap--narrow">
+    <div class="sec-head">
+      <span class="no no--gold">08</span>
+      <h2><span class="lang-pl">Słownik pojęć</span><span class="lang-en">Glossary</span></h2>
+      <span class="rule-d"></span>
+    </div>
+    <div class="glossary" id="glossary">
+      <!-- items injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 09 BIBLIOGRAFIA ════════════════════ -->
+<section class="sec-dark-2" id="bibliografia">
+  <div class="sec-wrap sec-wrap--narrow">
+    <div class="sec-head">
+      <span class="no no--gold">09</span>
+      <h2><span class="lang-pl">Bibliografia</span><span class="lang-en">References</span></h2>
+      <span class="rule-d"></span>
+    </div>
+    <div class="bib-list">
+      <div class="bib-item"><p>Alfina, Hartini, S., &amp; Mardhiyah, D. (2023). FOMO related consumer behaviour in marketing context: A systematic literature review. <em>Cogent Business &amp; Management, 10</em>(3), 2250033. <a href="https://doi.org/10.1080/23311975.2023.2250033" target="_blank">doi:10.1080/23311975.2023.2250033</a></p></div>
+      <div class="bib-item"><p>Bartosiak, A., Lee, J. E., &amp; Loibl, C. (2025). Fear of missing out, social media influencers, and the social, psychological and financial wellbeing of young consumers. <em>PLOS ONE, 20</em>(4), e0319034. <a href="https://doi.org/10.1371/journal.pone.0319034" target="_blank">doi:10.1371/journal.pone.0319034</a></p></div>
+      <div class="bib-item"><p>Ellahi, A., Javed, Y., Begum, S., Mushtaq, R., Rehman, M., &amp; Rehman, H. M. (2021). Bedtime Smart Phone Usage and Its Effects on Work-Related Behaviour at Workplace. <em>Frontiers in Psychology, 12</em>, 698413. <a href="https://doi.org/10.3389/fpsyg.2021.698413" target="_blank">doi:10.3389/fpsyg.2021.698413</a></p></div>
+      <div class="bib-item"><p>Peleg, O., &amp; Boniel-Nissim, M. (2024). Exploring the personality and relationship factors that mediate the connection between differentiation of self and phubbing. <em>Scientific Reports, 14</em>(1), 6572. <a href="https://doi.org/10.1038/s41598-024-55560-1" target="_blank">doi:10.1038/s41598-024-55560-1</a></p></div>
+      <div class="bib-item"><p>Przybylski, A. K., Murayama, K., DeHaan, C. R., &amp; Gladwell, V. (2013). Motivational, emotional, and behavioral correlates of fear of missing out. <em>Computers in Human Behavior, 29</em>(4), 1841–1848. <a href="https://doi.org/10.1016/j.chb.2013.02.014" target="_blank">doi:10.1016/j.chb.2013.02.014</a></p></div>
+      <div class="bib-item"><p>Saygın, M., &amp; Karadal, H. (2022). The Fear of Missing Out (FoMO): Theoretical Approach and Measurement in Organizations. W F. Özsungur (Red.), <em>Advances in Human and Social Aspects of Technology</em> (s. 631–651). IGI Global. <a href="https://doi.org/10.4018/978-1-7998-9187-1.ch028" target="_blank">doi:10.4018/978-1-7998-9187-1.ch028</a></p></div>
+      <div class="bib-item"><p>Takács, J., &amp; Seregély, B. (2025). Parallel mediation of FoMO and self-control on the relationship between problematic smartphone use and neuroticism. <em>Acta Psychologica, 260</em>, 105608. <a href="https://doi.org/10.1016/j.actpsy.2025.105608" target="_blank">doi:10.1016/j.actpsy.2025.105608</a></p></div>
+      <div class="bib-item"><p>Wang, L., Zhou, X., Song, X., Gan, X., Zhang, R., Liu, X., … Becker, B. (2023). Fear of missing out (FOMO) associates with reduced cortical thickness in core regions of the posterior default mode network and higher levels of problematic smartphone and social media use. <em>Addictive Behaviors, 143</em>, 107709. <a href="https://doi.org/10.1016/j.addbeh.2023.107709" target="_blank">doi:10.1016/j.addbeh.2023.107709</a></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 10 TEST FOMO ════════════════════ -->
+<section class="sec-dark" id="quiz">
+  <div class="sec-wrap sec-wrap--narrow">
+    <div class="sec-head">
+      <span class="no no--gold">10</span>
+      <h2><span class="lang-pl">Test FOMO — skala FoMOs</span><span class="lang-en">FOMO Self-Test — FoMOs Scale</span></h2>
+      <span class="rule-d"></span>
+    </div>
+    <p class="quiz-intro">
+      <span class="lang-pl">Poniżej znajduje się <b>oryginalna 10-itemowa skala FoMOs</b> (Przybylski i in., 2013) — to samo narzędzie, które będzie stosowane do selekcji uczestników badania. Oceń każde stwierdzenie w skali 1–5 i sprawdź swój wynik.</span>
+      <span class="lang-en">Below is the <b>original 10-item FoMOs scale</b> (Przybylski et al., 2013) — the same tool used to select study participants. Rate each statement on a 1–5 scale and check your score.</span>
+    </p>
+    <div class="quiz-questions" id="quizQuestions"></div>
+    <div style="display:flex;justify-content:center;margin-top:24px">
+      <button class="quiz-btn" id="quizSubmit">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span class="lang-pl">Oblicz wynik</span><span class="lang-en">Calculate score</span>
+      </button>
+    </div>
+    <div class="quiz-result" id="quizResult">
+      <div class="quiz-result__score" id="quizScore">—</div>
+      <div class="quiz-result__label" id="quizLabel"></div>
+      <div class="quiz-result__desc" id="quizDesc"></div>
+      <button class="quiz-btn" id="quizReset" style="margin-top:16px;background:rgba(255,255,255,.15);color:#fff">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg>
+        <span class="lang-pl">Wypełnij ponownie</span><span class="lang-en">Reset</span>
+      </button>
+    </div>
+    <div style="margin-top:20px;padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid var(--line-d);border-radius:10px;font-family:var(--mono);font-size:10.5px;color:var(--txt-d-soft)">
+      <span class="lang-pl">Skala FoMOs: Przybylski, A. K., Murayama, K., DeHaan, C. R., &amp; Gladwell, V. (2013). <em>Computers in Human Behavior, 29</em>(4), 1841–1848. Test ma charakter poglądowy — nie stanowi diagnozy klinicznej.</span>
+      <span class="lang-en">FoMOs scale: Przybylski et al. (2013). <em>Computers in Human Behavior, 29</em>(4), 1841–1848. This test is illustrative — not a clinical diagnosis.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ FOOTER ════════════════════ -->
+<footer>
+  <div class="footer__wrap">
+    <span>kogniLAB · D. Satora-Izquierdo · UMK Toruń · 2025/2026</span>
+    <span class="lang-pl">Raport interaktywny — EEG · FOMO · P300 · FAA</span>
+    <span class="lang-en">Interactive report — EEG · FOMO · P300 · FAA</span>
+  </div>
+</footer>
+
+<!-- ════════════════════ SCRIPTS ════════════════════ -->
+<script>
+/* ── EEG hero animation ── */
+(function(){
+  const canvas=document.getElementById('eeg');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const host=canvas.parentElement;
+  const gold='#FFCD00';
+  const lineCol='rgba(160,202,255,0.42)';
+  const lineColFaint='rgba(160,202,255,0.22)';
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W=0,H=0,dpr=Math.min(window.devicePixelRatio||1,2);
+  const CH=[
+    {y:0.14,amp:13,f:0.9,ph:0.0,sp:1.05,acc:false},
+    {y:0.27,amp:18,f:1.3,ph:1.7,sp:0.85,acc:false},
+    {y:0.40,amp:15,f:1.05,ph:3.1,sp:1.25,acc:false},
+    {y:0.53,amp:22,f:0.75,ph:0.6,sp:0.7,acc:true},
+    {y:0.66,amp:16,f:1.5,ph:2.2,sp:1.0,acc:false},
+    {y:0.79,amp:19,f:1.0,ph:4.0,sp:0.9,acc:false},
+    {y:0.91,amp:12,f:1.7,ph:1.1,sp:1.15,acc:false},
+  ];
+  function resize(){
+    const r=host.getBoundingClientRect();
+    W=Math.max(320,r.width);H=Math.max(360,r.height);
+    canvas.width=W*dpr;canvas.height=H*dpr;
+    canvas.style.width=W+'px';canvas.style.height=H+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function eegVal(x,t,ch){
+    const k=x*0.012;
+    let v=0;
+    v+=Math.sin(k*ch.f+t*ch.sp+ch.ph)*0.55;
+    v+=Math.sin(k*ch.f*2.3+t*ch.sp*1.6+ch.ph*1.7)*0.28;
+    v+=Math.sin(k*ch.f*4.7+t*ch.sp*0.6)*0.13;
+    v+=Math.sin(k*11.0+t*3.0+ch.ph)*0.06;
+    if(ch.acc){
+      const period=4.6;
+      const local=((t*ch.sp+x*0.0009)%period+period)%period;
+      const d=local-1.4;
+      v+=Math.exp(-(d*d)/0.06)*1.5;
+    }
+    return v*ch.amp;
+  }
+  let t0=performance.now();
+  function frame(now){
+    const t=reduce?2.0:(now-t0)/1000;
+    ctx.clearRect(0,0,W,H);
+    const step=4;
+    for(let ci=0;ci<CH.length;ci++){
+      const ch=CH[ci];
+      const baseY=H*ch.y;
+      ctx.beginPath();
+      for(let x=-2;x<=W+2;x+=step){
+        const y=baseY-eegVal(x,t,ch);
+        if(x===-2)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+      }
+      if(ch.acc){ctx.strokeStyle=gold;ctx.globalAlpha=0.85;ctx.lineWidth=1.7;ctx.shadowColor=gold;ctx.shadowBlur=8;}
+      else{ctx.strokeStyle=ci%2?lineColFaint:lineCol;ctx.globalAlpha=1;ctx.lineWidth=1.3;ctx.shadowBlur=0;}
+      ctx.stroke();ctx.shadowBlur=0;ctx.globalAlpha=1;
+    }
+    if(!reduce){
+      const px=((t*70)%(W+120))-60;
+      const grad=ctx.createLinearGradient(px-50,0,px+10,0);
+      grad.addColorStop(0,'rgba(255,205,0,0)');
+      grad.addColorStop(1,'rgba(255,205,0,0.18)');
+      ctx.fillStyle=grad;ctx.fillRect(px-50,0,60,H);
+      ctx.strokeStyle='rgba(255,205,0,0.45)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(px,0);ctx.lineTo(px,H);ctx.stroke();
+    }
+    if(!reduce)requestAnimationFrame(frame);
+  }
+  resize();requestAnimationFrame(frame);
+  let rT;window.addEventListener('resize',()=>{clearTimeout(rT);rT=setTimeout(()=>{resize();if(reduce)requestAnimationFrame(frame);},120);});
+})();
+
+/* ── Language toggle ── */
+(function(){
+  const root=document.documentElement;
+  const KEY='kognilab-lang';
+  const saved=localStorage.getItem(KEY);
+  if(saved==='en'||saved==='pl')setLang(saved,false);
+  function setLang(lang,store=true){
+    root.setAttribute('data-lang',lang);
+    root.setAttribute('lang',lang);
+    document.querySelectorAll('.langtog button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===lang)));
+    if(store)localStorage.setItem(KEY,lang);
+  }
+  document.querySelectorAll('.langtog button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+})();
+
+/* ── Abstract expand ── */
+(function(){
+  const toggle=document.getElementById('absToggle');
+  const more=document.getElementById('absMore');
+  if(!toggle||!more)return;
+  toggle.addEventListener('click',()=>{
+    const open=toggle.getAttribute('aria-expanded')==='true';
+    toggle.setAttribute('aria-expanded',String(!open));
+    more.setAttribute('aria-hidden',String(open));
+    more.style.maxHeight=open?'0px':more.scrollHeight+'px';
+  });
+  window.addEventListener('resize',()=>{if(toggle.getAttribute('aria-expanded')==='true')more.style.maxHeight=more.scrollHeight+'px';});
+})();
+
+/* ── Scrollspy ── */
+(function(){
+  const links=[...document.querySelectorAll('.nav__link')];
+  const map=new Map();
+  links.forEach(l=>{
+    const id=l.getAttribute('href').slice(1);
+    const el=document.getElementById(id);
+    if(el)map.set(el,l);
+  });
+  if(!map.size)return;
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){links.forEach(l=>l.classList.remove('is-active'));map.get(e.target)?.classList.add('is-active');}
+    });
+  },{rootMargin:'-45% 0px -50% 0px',threshold:0});
+  map.forEach((_,el)=>io.observe(el));
+})();
+
+/* ── Glossary ── */
+(function(){
+  const lang=()=>document.documentElement.getAttribute('data-lang')||'pl';
+  const TERMS=[
+    {
+      term:'FOMO',
+      short:{pl:'Fear of Missing Out',en:'Fear of Missing Out'},
+      body:{pl:'<b>Lęk przed pominięciem</b> — reakcja emocjonalna objawiająca się niepokojem, że inni przeżywają coś wartościowego pod naszą nieobecność. Silnie powiązane z intensywnym korzystaniem z mediów społecznościowych i kompulsywnym sprawdzaniem telefonu.',en:'<b>Fear of Missing Out</b> — an emotional reaction characterised by anxiety that others are experiencing something worthwhile in one\'s absence. Strongly linked to heavy social-media use and compulsive phone-checking.'}
+    },
+    {
+      term:'EEG',
+      short:{pl:'Elektroencefalografia',en:'Electroencephalography'},
+      body:{pl:'Technika rejestracji aktywności elektrycznej mózgu poprzez elektrody na powierzchni głowy. Milisekundowa rozdzielczość czasowa, nieinwazyjna. W badaniu: 64-kanałowy system Brain Products z elektrodami żelowymi.',en:'A technique for recording the brain\'s electrical activity via scalp electrodes. Millisecond temporal resolution, non-invasive. In this study: a 64-channel Brain Products system with gel electrodes.'}
+    },
+    {
+      term:'P300',
+      short:{pl:'Pozytywna składowa ERP ~300 ms po bodźcu',en:'Positive ERP component ~300 ms post-stimulus'},
+      body:{pl:'Endogenna składowa Potencjałów Wywołanych (ERP) rejestrowana w elektrodach ciemieniowych (Pz, Cz) w oknie 300–500 ms po bodźcu. Odzwierciedla procesy uwagowe i oceny znaczenia bodźca — im większa amplituda, tym silniejsza reakcja orientacyjna.',en:'An endogenous Event-Related Potential (ERP) component recorded at parietal electrodes (Pz, Cz) in a 300–500 ms post-stimulus window. Reflects attentional processes and stimulus significance evaluation — larger amplitude = stronger orienting response.'}
+    },
+    {
+      term:'FAA',
+      short:{pl:'Frontal Alpha Asymmetry — asymetria czołowa alfa',en:'Frontal Alpha Asymmetry'},
+      body:{pl:'Wskaźnik obliczany jako <code>ln(Moc F4) − ln(Moc F3)</code>. Niższa moc alfa po lewej stronie (F3) oznacza wyższą aktywację lewej półkuli czołowej — stan pobudzenia, gotowości do działania lub frustracji. Kluczowy wskaźnik hipotezy H1.',en:'An index computed as <code>ln(Power F4) − ln(Power F3)</code>. Lower alpha power on the left (F3) indicates greater activation of the left frontal hemisphere — a state of arousal, action readiness or frustration. The key marker for hypothesis H1.'}
+    },
+    {
+      term:'CPT',
+      short:{pl:'Continuous Performance Task — zadanie ciągłego wykonania',en:'Continuous Performance Task'},
+      body:{pl:'Zadanie komputerowe angażujące uwagę — uczestnik reaguje na literę „X" pojawiającą się na ekranie. Cel: utrzymanie uwagi i uniemożliwienie swobodnego myślenia o telefonie podczas nagrywania sygnału EEG.',en:'A computer task that engages attention — the participant responds to the letter "X" appearing on screen. Purpose: sustaining attention and preventing free thinking about the phone during EEG recording.'}
+    },
+    {
+      term:'ERP',
+      short:{pl:'Event-Related Potentials — Potencjały Wywołane',en:'Event-Related Potentials'},
+      body:{pl:'Zmiany potencjału elektrycznego mózgu zsynchronizowane z bodźcem lub zdarzeniem. Uśrednianie wielu prób eliminuje szum tła. Składowe: N100 (ok. 100 ms, negatywna), P200 (ok. 200 ms), P300 (ok. 350 ms, pozytywna, kluczowa w badaniu).',en:'Changes in brain electrical potential time-locked to a stimulus or event. Averaging across many trials cancels background noise. Components: N100 (~100 ms, negative), P200 (~200 ms), P300 (~350 ms, positive, key in this study).'}
+    },
+    {
+      term:'FoMOs',
+      short:{pl:'Fear of Missing Out Scale (Przybylski i in., 2013)',en:'Fear of Missing Out Scale (Przybylski et al., 2013)'},
+      body:{pl:'Standaryzowany 10-itemowy kwestionariusz samoopisowy w skali Likerta (1 = wcale mnie nie dotyczy, 5 = bardzo mnie dotyczy). Używany do: (a) selekcji uczestników metodą doboru skrajnego, (b) jako ciągła zmienna korelacyjna w analizach.',en:'A standardised 10-item self-report questionnaire on a Likert scale (1 = not at all true of me, 5 = extremely true of me). Used to: (a) select participants via extreme-groups sampling, (b) as a continuous correlational variable in analyses.'}
+    },
+    {
+      term:'ICA',
+      short:{pl:'Independent Component Analysis — analiza składowych niezależnych',en:'Independent Component Analysis'},
+      body:{pl:'Technika statystyczna używana do rozdzielenia sygnału EEG na niezależne źródła. Pozwala identyfikować i usuwać artefakty (mruganie oczu, napięcie mięśniowe) bez utraty danych neuronalnych.',en:'A statistical technique for separating the EEG signal into independent sources. Allows identification and removal of artefacts (eye blinks, muscle tension) without losing neural data.'}
+    },
+  ];
+
+  const container=document.getElementById('glossary');
+  if(!container)return;
+
+  function render(){
+    const l=lang();
+    container.innerHTML=TERMS.map((t,i)=>`
+      <div class="glos-item">
+        <button class="glos-trigger" aria-expanded="false" aria-controls="gb${i}" data-idx="${i}">
+          <span class="glos-trigger__term">${t.term}</span>
+          <span class="glos-trigger__short">${t.short[l]}</span>
+          <svg class="glos-trigger__chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="glos-body" id="gb${i}" aria-hidden="true">
+          <div class="glos-body__inner">${t.body[l]}</div>
+        </div>
+      </div>`).join('');
+    container.querySelectorAll('.glos-trigger').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const open=btn.getAttribute('aria-expanded')==='true';
+        const body=document.getElementById(btn.getAttribute('aria-controls'));
+        btn.setAttribute('aria-expanded',String(!open));
+        body.setAttribute('aria-hidden',String(open));
+        body.style.maxHeight=open?'0px':body.scrollHeight+'px';
+      });
+    });
+  }
+  render();
+  document.querySelectorAll('.langtog button').forEach(b=>b.addEventListener('click',()=>setTimeout(render,0)));
+})();
+
+/* ── FOMO Quiz ── */
+(function(){
+  const lang=()=>document.documentElement.getAttribute('data-lang')||'pl';
+  const QUESTIONS={
+    pl:[
+      'Obawiam się, że inni mają bardziej satysfakcjonujące doświadczenia niż ja.',
+      'Boję się, że moi znajomi mają lepsze doświadczenia niż ja.',
+      'Martwię się, że przegapię ważne wydarzenie towarzyskie.',
+      'Kiedy dobrze się bawię, ważne jest dla mnie, że inni też to wiedzą.',
+      'Martwię się, kiedy widzę, że znajomi dobrze się bawią beze mnie.',
+      'Ważne jest dla mnie, żeby rozumieć żarty i aluzje moich znajomych.',
+      'Czuję niepokój, gdy nie wiem, co robią moi znajomi.',
+      'Martwię się, gdy coś ciekawego dzieje się gdzie indziej.',
+      'Kiedy spędzam czas ze znajomymi, ważne jest dla mnie zrobienie zdjęcia.',
+      'Martwię się, kiedy muszę odłożyć telefon na dłużej.',
+    ],
+    en:[
+      'I fear others have more rewarding experiences than me.',
+      'I fear my friends have better experiences than me.',
+      'I get worried that I will miss an important social event.',
+      'When I have a good time, it is important to me that others know about it.',
+      'I get anxious when I see my friends enjoying themselves without me.',
+      'It is important to me to understand "in jokes" my friends have.',
+      'I get anxious when I don\'t know what my friends are up to.',
+      'I get worried when I hear something interesting is happening elsewhere.',
+      'When I\'m with friends, it is important for me to take a photo.',
+      'I worry when I have to put my phone away for a while.',
+    ]
+  };
+  const labels={pl:['wcale','trochę','średnio','dużo','bardzo'],en:['not at all','a little','moderately','a lot','extremely']};
+
+  function buildQuiz(){
+    const l=lang();
+    const qs=QUESTIONS[l]||QUESTIONS.pl;
+    const qsL=QUESTIONS[l]||QUESTIONS.pl;
+    const lb=labels[l]||labels.pl;
+    const container=document.getElementById('quizQuestions');
+    if(!container)return;
+    container.innerHTML=qsL.map((q,i)=>`
+      <div class="quiz-q">
+        <div class="quiz-q__text"><span>Q${i+1}</span>${q}</div>
+        <div class="likert">
+          ${[1,2,3,4,5].map(v=>`
+            <label>
+              <input type="radio" name="q${i}" value="${v}">
+              <div class="likert__btn">${v}</div>
+            </label>`).join('')}
+        </div>
+        <div class="likert__labels">
+          <span>${lb[0]}</span><span style="margin-left:auto">${lb[4]}</span>
+        </div>
+      </div>`).join('');
+  }
+  buildQuiz();
+  document.querySelectorAll('.langtog button').forEach(b=>b.addEventListener('click',()=>setTimeout(buildQuiz,0)));
+
+  document.getElementById('quizSubmit')?.addEventListener('click',()=>{
+    const l=lang();
+    let total=0,answered=0;
+    for(let i=0;i<10;i++){
+      const val=document.querySelector(`input[name="q${i}"]:checked`);
+      if(val){total+=parseInt(val.value);answered++;}
+    }
+    if(answered<10){
+      alert(l==='en'?'Please answer all 10 questions.':'Proszę odpowiedzieć na wszystkie 10 pytań.');
+      return;
+    }
+    const result=document.getElementById('quizResult');
+    const scoreEl=document.getElementById('quizScore');
+    const labelEl=document.getElementById('quizLabel');
+    const descEl=document.getElementById('quizDesc');
+    scoreEl.textContent=total+'/50';
+    let lbl,desc;
+    if(total<=20){
+      lbl=l==='en'?'Low FOMO':'Niskie FOMO';
+      desc=l==='en'?'Your score suggests a low tendency to fear missing out. You could be a participant in Group B (Low-FOMO) in this study.':'Twój wynik sugeruje niską tendencję do lęku przed pominięciem. W badaniu kwalifikowałbyś/-abyś się do Grupy B (niskie FOMO).';
+    }else if(total<=35){
+      lbl=l==='en'?'Moderate FOMO':'Umiarkowane FOMO';
+      desc=l==='en'?'Your score is in the moderate range — typical for many social media users. You might not qualify for either extreme group in the study.':'Twój wynik mieści się w przedziale umiarkowanym — typowym dla wielu użytkowników mediów społecznościowych. Możliwe, że nie kwalifikowałbyś/-abyś się do żadnej z grup skrajnych.';
+    }else{
+      lbl=l==='en'?'High FOMO':'Wysokie FOMO';
+      desc=l==='en'?'Your score suggests a high tendency to fear missing out. You could be a participant in Group A (High-FOMO) in this study — where we expect stronger brain responses to notification sounds.':'Twój wynik sugeruje wysoką tendencję do lęku przed pominięciem. W badaniu kwalifikowałbyś/-abyś się do Grupy A (wysokie FOMO) — gdzie oczekujemy silniejszej reakcji mózgu na dźwięki powiadomień.';
+    }
+    labelEl.textContent=lbl;
+    descEl.textContent=desc;
+    result.classList.add('show');
+    result.scrollIntoView({behavior:'smooth',block:'center'});
+  });
+
+  document.getElementById('quizReset')?.addEventListener('click',()=>{
+    document.getElementById('quizResult')?.classList.remove('show');
+    document.querySelectorAll('input[type="radio"]').forEach(r=>r.checked=false);
+    document.getElementById('quizQuestions')?.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+})();
+</script>
+
+<!-- ════════════════════ EDIT MODE ════════════════════ -->
+<script>
+/* ── kogniLAB edit mode ──────────────────────────────────────────────────────
+   Safe to load multiple times: the very first line guards against duplication.
+   beforeunload always exits edit mode so the button is never "stuck on" after
+   a reload / navigation.
+   ─────────────────────────────────────────────────────────────────────────── */
+(function () {
+  'use strict';
+
+  /* ── 1. DUPLICATION GUARD ── runs before anything is created */
+  if (document.getElementById('__kl_editFab')) return;
+
+  const NS  = 'kl-edit-v1:';   // localStorage namespace
+  let editing = false;
+  const items = [];             // { el, key }
+
+  /* ── 2. EDITABLE SELECTORS ── */
+  const SEL = [
+    'h1.title',
+    '.subtitle',
+    '.hook__body p',
+    '.hook__body .src',
+    '.abs-lead',
+    '.abs-more p',
+    '.abs-tag',
+    '.tldr__item h3', '.tldr__item p',
+    '.stat-card__label',
+    '.rq-box p',
+    '.hyp-card h3', '.hyp-card p',
+    '.equip-item h4', '.equip-item p',
+    '.proc-step h4', '.proc-step p',
+    '.team-card h3', '.team-card p',
+    '.tl-content h3', '.tl-content p', '.tl-content__tag',
+    '.glos-body__inner',
+    '.bib-item p',
+    '.quiz-intro',
+    '.about-card p',
+    /* section headings — but not nav links */
+    '.sec-head h2',
+  ];
+
+  /* ── 3. REGISTER ELEMENTS ── assign stable keys, restore saved text */
+  function register () {
+    let idx = parseInt(localStorage.getItem(NS + '__idx') || '0', 10);
+    SEL.forEach(sel => {
+      document.querySelectorAll(sel).forEach(el => {
+        if (el.dataset.ekKey) return;          // already registered (SPA safety)
+        const key = 'k' + (idx++);
+        el.dataset.ekKey = key;
+        const saved = localStorage.getItem(NS + key);
+        if (saved !== null) el.innerHTML = saved;
+        el.addEventListener('input', () => localStorage.setItem(NS + key, el.innerHTML));
+        items.push({ el, key });
+      });
+    });
+    localStorage.setItem(NS + '__idx', String(idx));
+  }
+
+  /* ── 4. STYLES ── injected once */
+  const style = document.createElement('style');
+  style.id = '__kl_editStyle';
+  style.textContent = `
+    /* editable outlines */
+    html.kl-editing [data-ek-key] {
+      outline: 1.5px dashed rgba(255,205,0,.45);
+      outline-offset: 3px;
+      border-radius: 3px;
+      cursor: text;
+      transition: outline-color .15s, background .15s;
+      min-height: 1em;
+    }
+    html.kl-editing [data-ek-key]:hover {
+      outline-color: rgba(255,205,0,.85);
+      background: rgba(255,205,0,.07);
+    }
+    html.kl-editing [data-ek-key]:focus {
+      outline: 2px solid #FFCD00;
+      background: rgba(255,205,0,.11);
+    }
+    /* FAB shell */
+    #__kl_editFab {
+      position: fixed;
+      top: 72px;
+      right: 18px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      font-family: "IBM Plex Sans", system-ui, sans-serif;
+    }
+    /* main toggle button */
+    #__kl_editBtn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      cursor: pointer;
+      border-radius: 100px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 15px;
+      box-shadow: 0 8px 28px -8px rgba(0,0,0,.65);
+      transition: transform .16s, filter .16s, background .2s;
+      background: #FFCD00;
+      color: #04203f;
+      white-space: nowrap;
+    }
+    #__kl_editBtn:hover { transform: translateY(-1px); filter: brightness(1.07); }
+    #__kl_editBtn.kl-on { background: #18865a; color: #fff; }
+    /* dropdown panel */
+    #__kl_editPanel {
+      display: none;
+      flex-direction: column;
+      gap: 3px;
+      background: #fff;
+      border: 1px solid #d9e2ee;
+      border-radius: 13px;
+      padding: 7px;
+      box-shadow: 0 18px 52px -16px rgba(3,30,70,.42);
+      min-width: 200px;
+    }
+    #__kl_editPanel.kl-open { display: flex; }
+    .__kl_act {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: #13233b;
+      padding: 9px 11px;
+      border-radius: 8px;
+      transition: background .13s;
+    }
+    .__kl_act:hover { background: #f1f5fb; }
+    .__kl_act svg { width: 15px; height: 15px; color: #034EA1; flex-shrink: 0; }
+    .__kl_act.danger { color: #b4321f; }
+    .__kl_act.danger svg { color: #b4321f; }
+    .__kl_hint {
+      padding: 5px 11px 7px;
+      font-size: 10.5px;
+      color: #64748b;
+      font-family: "IBM Plex Mono", monospace;
+      line-height: 1.5;
+    }
+    @media print { #__kl_editFab { display: none !important; } }
+  `;
+  document.head.appendChild(style);
+
+  /* ── 5. BUILD FAB HTML ── */
+  const fab = document.createElement('div');
+  fab.id = '__kl_editFab';
+  fab.setAttribute('data-edit-ui', '');
+  fab.innerHTML = `
+    <div id="__kl_editPanel">
+      <button class="__kl_act" id="__kl_saveBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/>
+        </svg>
+        <span class="lang-pl">Pobierz HTML</span><span class="lang-en">Download HTML</span>
+      </button>
+      <button class="__kl_act danger" id="__kl_resetBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/>
+        </svg>
+        <span class="lang-pl">Resetuj zmiany</span><span class="lang-en">Reset changes</span>
+      </button>
+      <div class="__kl_hint">
+        <span class="lang-pl">Kliknij dowolny tekst aby go edytować.<br>Zmiany zapisują się automatycznie.</span>
+        <span class="lang-en">Click any text to edit it.<br>Changes save automatically.</span>
+      </div>
+    </div>
+    <button id="__kl_editBtn" title="Tryb edycji / Edit mode">
+      <svg id="__kl_icPen" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1">
+        <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+      </svg>
+      <svg id="__kl_icDone" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="display:none">
+        <path d="M20 6 9 17l-5-5"/>
+      </svg>
+      <span id="__kl_editLbl"><span class="lang-pl">Edytuj</span><span class="lang-en">Edit</span></span>
+    </button>`;
+  document.body.appendChild(fab);
+
+  /* ── 6. TOGGLE EDIT MODE ── */
+  function setEditing (on) {
+    editing = on;
+    document.documentElement.classList.toggle('kl-editing', on);
+    items.forEach(({ el }) => { el.contentEditable = on ? 'true' : 'false'; });
+    /* update FAB visuals */
+    document.getElementById('__kl_editBtn').classList.toggle('kl-on', on);
+    document.getElementById('__kl_icPen').style.display  = on ? 'none' : '';
+    document.getElementById('__kl_icDone').style.display = on ? '' : 'none';
+    document.getElementById('__kl_editPanel').classList.toggle('kl-open', on);
+    const lbl = document.getElementById('__kl_editLbl');
+    const isPL = (document.documentElement.getAttribute('data-lang') || 'pl') !== 'en';
+    lbl.innerHTML = on
+      ? `<span class="lang-pl">Gotowe</span><span class="lang-en">Done</span>`
+      : `<span class="lang-pl">Edytuj</span><span class="lang-en">Edit</span>`;
+  }
+
+  document.getElementById('__kl_editBtn').addEventListener('click', () => setEditing(!editing));
+
+  /* update label text when language changes */
+  document.querySelectorAll('.langtog button').forEach(b =>
+    b.addEventListener('click', () => { if (!editing) return;
+      setTimeout(() => setEditing(true), 0); }));
+
+  /* ── 7. EXIT ON PAGE CLOSE / NAVIGATE ── */
+  window.addEventListener('beforeunload', () => {
+    if (editing) setEditing(false);
+  });
+  /* also exit if user presses Escape */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && editing) setEditing(false);
+  });
+
+  /* ── 8. DOWNLOAD BAKED HTML ── */
+  document.getElementById('__kl_saveBtn').addEventListener('click', () => {
+    const clone = document.documentElement.cloneNode(true);
+    /* clean up edit-mode artefacts */
+    clone.classList.remove('kl-editing');
+    clone.querySelectorAll('[data-edit-ui]').forEach(n => n.remove());
+    clone.querySelectorAll('#__kl_editStyle').forEach(n => n.remove());
+    clone.querySelectorAll('[contenteditable]').forEach(n => n.removeAttribute('contenteditable'));
+    clone.querySelectorAll('[data-ek-key]').forEach(n => n.removeAttribute('data-ek-key'));
+    const html = '<!DOCTYPE html>\n' + clone.outerHTML;
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'kogniLAB-raport-edited.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  });
+
+  /* ── 9. RESET ── */
+  document.getElementById('__kl_resetBtn').addEventListener('click', () => {
+    const isPL = (document.documentElement.getAttribute('data-lang') || 'pl') !== 'en';
+    const msg = isPL ? 'Cofnąć wszystkie zmiany w treści?' : 'Discard all text edits?';
+    if (!confirm(msg)) return;
+    Object.keys(localStorage)
+      .filter(k => k.startsWith(NS))
+      .forEach(k => localStorage.removeItem(k));
+    location.reload();
+  });
+
+  /* ── 10. INIT ── register elements & restore saved text */
+  register();
+})();
+</script>
+
+</body>
+</html>

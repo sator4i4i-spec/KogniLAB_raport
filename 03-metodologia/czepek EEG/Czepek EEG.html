@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Czepek EEG — układ 10-10</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --accent:#2563eb;
+  --ink:#0f172a;
+  --ink-2:#334155;
+  --muted:#64748b;
+  --line:#e2e8f0;
+  --line-2:#eef1f6;
+  --bg:#f4f6fa;
+  --panel:#ffffff;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(15,23,42,.04), 0 8px 28px -16px rgba(15,23,42,.18);
+}
+*{box-sizing:border-box;}
+html,body{height:100%;margin:0;}
+body{
+  font-family:"IBM Plex Sans",system-ui,sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+.app{
+  height:100vh;
+  display:grid;
+  grid-template-columns:1fr 372px;
+  grid-template-rows:auto 1fr;
+  grid-template-areas:"head head" "stage side";
+}
+
+/* nagłówek */
+header{
+  grid-area:head;
+  display:flex;align-items:center;gap:16px;
+  padding:16px 26px;
+  background:var(--panel);
+  border-bottom:1px solid var(--line);
+}
+.logo{
+  width:38px;height:38px;border-radius:10px;flex:none;
+  background:linear-gradient(150deg,var(--accent),#1e40af);
+  display:grid;place-items:center;
+  box-shadow:0 4px 14px -4px rgba(37,99,235,.6);
+}
+.logo svg{width:22px;height:22px;}
+.h-txt h1{font-size:16px;font-weight:600;margin:0;letter-spacing:-.01em;}
+.h-txt p{font-size:12.5px;color:var(--muted);margin:2px 0 0;}
+.h-spacer{flex:1;}
+.pill{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;
+  color:var(--ink-2);background:var(--line-2);border:1px solid var(--line);
+  padding:6px 11px;border-radius:999px;letter-spacing:.02em;
+}
+
+/* scena */
+.stage{
+  grid-area:stage;position:relative;overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 50% 8%, #ffffff 0%, #eef2f8 55%, #e4eaf2 100%);
+}
+#scene{position:absolute;inset:0;cursor:grab;touch-action:none;}
+#scene:active{cursor:grabbing;}
+.hint{
+  position:absolute;left:50%;bottom:18px;transform:translateX(-50%);
+  font-size:12px;color:var(--muted);background:rgba(255,255,255,.78);
+  border:1px solid var(--line);backdrop-filter:blur(6px);
+  padding:7px 14px;border-radius:999px;display:flex;gap:8px;align-items:center;
+}
+.hint b{color:var(--ink-2);font-weight:600;}
+
+/* przyciski widoku */
+.views{
+  position:absolute;top:16px;left:16px;display:flex;gap:5px;
+  background:rgba(255,255,255,.82);border:1px solid var(--line);
+  backdrop-filter:blur(6px);padding:5px;border-radius:12px;box-shadow:var(--shadow);
+}
+.views button{
+  font-family:inherit;font-size:12px;font-weight:500;color:var(--ink-2);
+  border:none;background:transparent;padding:6px 10px;border-radius:8px;cursor:pointer;
+  transition:background .15s,color .15s;
+}
+.views button:hover{background:var(--line-2);color:var(--ink);}
+
+/* tooltip */
+#tooltip{
+  position:absolute;top:0;left:0;pointer-events:none;opacity:0;
+  transition:opacity .12s;z-index:5;
+  background:var(--ink);color:#fff;border-radius:9px;padding:8px 11px;
+  box-shadow:0 8px 24px -8px rgba(0,0,0,.5);will-change:transform;
+}
+.tt-name{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:14px;display:block;}
+.tt-reg{display:flex;align-items:center;gap:6px;font-size:11px;color:#cbd5e1;margin-top:3px;}
+.tt-reg i{width:8px;height:8px;border-radius:50%;display:inline-block;}
+
+/* panel boczny */
+aside{
+  grid-area:side;background:var(--panel);border-left:1px solid var(--line);
+  display:flex;flex-direction:column;overflow-y:auto;
+}
+.sec{padding:18px 20px;border-bottom:1px solid var(--line-2);}
+.sec-title{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0 0 12px;}
+
+/* legenda */
+#legend{display:flex;flex-direction:column;gap:3px;}
+.leg-item{
+  display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+  font-family:inherit;font-size:13.5px;color:var(--ink-2);font-weight:500;
+  background:transparent;border:1px solid transparent;border-radius:10px;
+  padding:8px 10px;cursor:pointer;transition:background .15s,border-color .15s;
+}
+.leg-item:hover{background:var(--line-2);}
+.leg-item.active{background:#eef4ff;border-color:#cfe0ff;color:var(--ink);}
+.leg-item i{width:13px;height:13px;border-radius:4px;flex:none;}
+.leg-item span{flex:1;}
+.leg-item em{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--muted);}
+.leg-all{margin-top:5px;border-top:1px dashed var(--line);border-radius:0 0 10px 10px;padding-top:11px;color:var(--muted);}
+.leg-all span{font-weight:600;}
+
+/* przełączniki */
+.toggles{display:flex;flex-direction:column;gap:2px;}
+.tg{
+  display:flex;align-items:center;gap:12px;width:100%;
+  font-family:inherit;font-size:13.5px;color:var(--ink-2);font-weight:500;
+  background:transparent;border:none;border-radius:10px;padding:9px 10px;cursor:pointer;
+  transition:background .15s;
+}
+.tg:hover{background:var(--line-2);}
+.tg .sw{
+  width:38px;height:22px;border-radius:999px;background:#cbd5e1;flex:none;position:relative;
+  transition:background .18s;
+}
+.tg .sw::after{
+  content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .18s;
+}
+.tg.on .sw{background:var(--accent);}
+.tg.on .sw::after{transform:translateX(16px);}
+.tg span{flex:1;text-align:left;}
+
+/* szczegóły */
+#detail{padding:18px 20px;flex:1;}
+.detail-empty .muted{font-size:13px;color:var(--muted);line-height:1.55;margin:0 0 18px;}
+.quick-lbl{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);}
+.quick-chips{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;}
+.chip-an{
+  font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;
+  color:var(--accent);background:#eef4ff;border:1px solid #cfe0ff;
+  padding:7px 13px;border-radius:9px;cursor:pointer;transition:.15s;
+}
+.chip-an:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+.detail-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.d-name{font-family:"IBM Plex Mono",monospace;font-size:30px;font-weight:600;letter-spacing:-.01em;}
+.d-flag{
+  font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--accent);background:#eef4ff;border:1px solid #cfe0ff;
+  padding:4px 9px;border-radius:999px;
+}
+.d-region{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;margin-bottom:18px;}
+.d-region i{width:12px;height:12px;border-radius:4px;background:var(--rc);}
+.d-region em{font-style:normal;font-weight:500;font-size:12px;color:var(--muted);margin-left:auto;}
+.d-block{margin-bottom:16px;}
+.d-lbl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;}
+.d-block p{margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-2);text-wrap:pretty;}
+.d-note{background:#f6f9ff;border:1px solid #e3ecfb;border-radius:12px;padding:13px 14px;}
+.d-note .d-lbl{color:var(--accent);}
+.d-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px;}
+.d-meta div{background:var(--line-2);border-radius:10px;padding:9px 11px;}
+.d-meta span{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+.d-meta b{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;color:var(--ink);}
+
+@media (max-width:900px){
+  .app{grid-template-columns:1fr;grid-template-rows:auto 56vh auto;grid-template-areas:"head" "stage" "side";}
+  aside{border-left:none;border-top:1px solid var(--line);}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12h3l2-6 3 14 3-11 2 5h5"/>
+      </svg>
+    </div>
+    <div class="h-txt">
+      <h1>Czepek EEG — interaktywny model elektrod</h1>
+      <p>Międzynarodowy układ 10-10 (rozszerzony 10-20) · materiał dydaktyczny</p>
+    </div>
+    <div class="h-spacer"></div>
+    <span class="pill" id="count-pill">— elektrod</span>
+  </header>
+
+  <div class="stage">
+    <canvas id="scene"></canvas>
+    <div class="views">
+      <button id="v-iso">3/4</button>
+      <button id="v-top">Góra</button>
+      <button id="v-front">Przód</button>
+      <button id="v-left">Lewo</button>
+      <button id="v-right">Prawo</button>
+      <button id="v-back">Tył</button>
+    </div>
+    <div id="tooltip"></div>
+    <div class="hint"><b>Przeciągnij</b> aby obrócić · <b>kliknij</b> elektrodę po szczegóły</div>
+  </div>
+
+  <aside>
+    <div class="sec">
+      <p class="sec-title">Regiony / płaty mózgu</p>
+      <div id="legend"></div>
+    </div>
+    <div class="sec">
+      <p class="sec-title">Widok</p>
+      <div class="toggles">
+        <button class="tg" id="tg-labels" aria-pressed="false"><span>Pokaż nazwy elektrod</span><span class="sw"></span></button>
+        <button class="tg" id="tg-analytical" aria-pressed="true"><span>Wyróżnij elektrody analityczne</span><span class="sw"></span></button>
+        <button class="tg" id="tg-grid" aria-pressed="true"><span>Pokaż siatkę czepka</span><span class="sw"></span></button>
+      </div>
+    </div>
+    <div id="detail"></div>
+  </aside>
+</div>
+
+<script src="eeg-data.js"></script>
+<script src="eeg-app.js"></script>
+<script>
+  document.getElementById('count-pill').textContent = EEG_ELECTRODES.length + ' elektrod';
+</script>
+
+<!-- Panel Tweaks (osobny root React, steruje rendererem przez window.eegApi) -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+// tweaks-panel.jsx — inlined to avoid file:// XHR restriction
+const __TWEAKS_STYLE = `
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;
+    max-height:calc(100vh - 32px);display:flex;flex-direction:column;
+    transform:scale(var(--dc-inv-zoom,1));transform-origin:bottom right;
+    background:rgba(250,249,247,.78);color:#29261b;
+    -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+    border:.5px solid rgba(255,255,255,.6);border-radius:14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.18);
+    font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-hd{display:flex;align-items:center;justify-content:space-between;
+    padding:10px 8px 10px 14px;cursor:move;user-select:none}
+  .twk-hd b{font-size:12px;font-weight:600;letter-spacing:.01em}
+  .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);
+    width:22px;height:22px;border-radius:6px;cursor:default;font-size:13px;line-height:1}
+  .twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;
+    overflow-y:auto;overflow-x:hidden;min-height:0}
+  .twk-row{display:flex;flex-direction:column;gap:5px}
+  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;color:rgba(41,38,27,.72)}
+  .twk-lbl>span:first-child{font-weight:500}
+  .twk-val{color:rgba(41,38,27,.5);font-variant-numeric:tabular-nums}
+  .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:rgba(41,38,27,.45);padding:10px 0 0}
+  .twk-sect:first-child{padding-top:0}
+  .twk-field{appearance:none;box-sizing:border-box;width:100%;min-width:0;height:26px;padding:0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;background:rgba(255,255,255,.6);color:inherit;font:inherit;outline:none}
+  select.twk-field{padding-right:22px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='rgba(0,0,0,.5)' d='M0 0h10L5 6z'/></svg>");
+    background-repeat:no-repeat;background-position:right 8px center}
+  .twk-slider{appearance:none;-webkit-appearance:none;width:100%;height:4px;margin:6px 0;
+    border-radius:999px;background:rgba(0,0,0,.12);outline:none}
+  .twk-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:14px;height:14px;border-radius:50%;background:#fff;
+    border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+  .twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;background:rgba(0,0,0,.06);user-select:none}
+  .twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;
+    background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);
+    transition:left .15s,width .15s}
+  .twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;
+    background:transparent;color:inherit;font:inherit;font-weight:500;min-height:22px;
+    border-radius:6px;cursor:default;padding:4px 6px}
+  .twk-toggle{position:relative;width:32px;height:18px;border:0;border-radius:999px;
+    background:rgba(0,0,0,.15);transition:background .15s;cursor:default;padding:0}
+  .twk-toggle[data-on="1"]{background:#34c759}
+  .twk-toggle i{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+  .twk-toggle[data-on="1"] i{transform:translateX(14px)}
+  .twk-swatch{appearance:none;-webkit-appearance:none;width:56px;height:22px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:6px;padding:0;cursor:default;background:transparent;flex-shrink:0}
+  .twk-swatch::-webkit-color-swatch-wrapper{padding:0}
+  .twk-swatch::-webkit-color-swatch{border:0;border-radius:5.5px}
+  .twk-chips{display:flex;gap:6px}
+  .twk-chip{position:relative;appearance:none;flex:1;min-width:0;height:46px;
+    padding:0;border:0;border-radius:6px;overflow:hidden;cursor:default;
+    box-shadow:0 0 0 .5px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.06);transition:transform .12s,box-shadow .12s}
+  .twk-chip:hover{transform:translateY(-1px);box-shadow:0 0 0 .5px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.12)}
+  .twk-chip[data-on="1"]{box-shadow:0 0 0 1.5px rgba(0,0,0,.85),0 2px 6px rgba(0,0,0,.15)}
+  .twk-chip>span{position:absolute;top:0;bottom:0;right:0;width:34%;display:flex;flex-direction:column;box-shadow:-1px 0 0 rgba(0,0,0,.1)}
+  .twk-chip>span>i{flex:1}
+  .twk-chip svg{position:absolute;top:6px;left:6px;width:13px;height:13px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
+`;
+
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(defaults);
+  const setTweak = React.useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null ? keyOrEdits : { [keyOrEdits]: val };
+    setValues((prev) => ({ ...prev, ...edits }));
+  }, []);
+  return [values, setTweak];
+}
+
+function TweaksPanel({ title = 'Tweaks', children }) {
+  const [open, setOpen] = React.useState(false);
+  const dragRef = React.useRef(null);
+  const offsetRef = React.useRef({ x: 16, y: 16 });
+  React.useEffect(() => {
+    const onMsg = (e) => {
+      const t = e?.data?.type;
+      if (t === '__activate_edit_mode') setOpen(true);
+      else if (t === '__deactivate_edit_mode') setOpen(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+  const onDragStart = (e) => {
+    const panel = dragRef.current; if (!panel) return;
+    const r = panel.getBoundingClientRect();
+    const sx = e.clientX, sy = e.clientY;
+    const startRight = window.innerWidth - r.right, startBottom = window.innerHeight - r.bottom;
+    const move = (ev) => {
+      offsetRef.current = { x: startRight - (ev.clientX - sx), y: startBottom - (ev.clientY - sy) };
+      panel.style.right = offsetRef.current.x + 'px'; panel.style.bottom = offsetRef.current.y + 'px';
+    };
+    const up = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
+    window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
+  };
+  if (!open) return null;
+  return (
+    <>
+      <style>{__TWEAKS_STYLE}</style>
+      <div ref={dragRef} className="twk-panel" style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}>
+        <div className="twk-hd" onMouseDown={onDragStart}>
+          <b>{title}</b>
+          <button className="twk-x" onMouseDown={(e) => e.stopPropagation()}
+                  onClick={() => { setOpen(false); window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*'); }}>✕</button>
+        </div>
+        <div className="twk-body">{children}</div>
+      </div>
+    </>
+  );
+}
+
+function TweakSection({ label, children }) { return <><div className="twk-sect">{label}</div>{children}</>; }
+function TweakRow({ label, value, children, inline = false }) {
+  return (
+    <div className={inline ? 'twk-row twk-row-h' : 'twk-row'}>
+      <div className="twk-lbl"><span>{label}</span>{value != null && <span className="twk-val">{value}</span>}</div>
+      {children}
+    </div>
+  );
+}
+function TweakSlider({ label, value, min = 0, max = 100, step = 1, unit = '', onChange }) {
+  return (
+    <TweakRow label={label} value={`${value}${unit}`}>
+      <input type="range" className="twk-slider" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} />
+    </TweakRow>
+  );
+}
+function TweakToggle({ label, value, onChange }) {
+  return (
+    <div className="twk-row twk-row-h">
+      <div className="twk-lbl"><span>{label}</span></div>
+      <button type="button" className="twk-toggle" data-on={value ? '1' : '0'} onClick={() => onChange(!value)}><i /></button>
+    </div>
+  );
+}
+function TweakSelect({ label, value, options, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <select className="twk-field" value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map((o) => { const v = typeof o === 'object' ? o.value : o; const l = typeof o === 'object' ? o.label : o; return <option key={v} value={v}>{l}</option>; })}
+      </select>
+    </TweakRow>
+  );
+}
+function TweakRadio({ label, value, options, onChange }) {
+  const opts = options.map((o) => (typeof o === 'object' ? o : { value: o, label: o }));
+  const idx = Math.max(0, opts.findIndex((o) => o.value === value));
+  const n = opts.length;
+  return (
+    <TweakRow label={label}>
+      <div className="twk-seg" role="radiogroup">
+        <div className="twk-seg-thumb" style={{ left: `calc(2px + ${idx} * (100% - 4px) / ${n})`, width: `calc((100% - 4px) / ${n})` }} />
+        {opts.map((o) => (<button key={o.value} type="button" role="radio" aria-checked={o.value === value} onClick={() => onChange(o.value)}>{o.label}</button>))}
+      </div>
+    </TweakRow>
+  );
+}
+function TweakText({ label, value, placeholder, onChange }) {
+  return <TweakRow label={label}><input className="twk-field" type="text" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} /></TweakRow>;
+}
+function TweakNumber({ label, value, min, max, step = 1, unit = '', onChange }) {
+  return (
+    <div className="twk-row"><div className="twk-lbl"><span>{label}</span></div>
+      <input type="number" className="twk-field" value={value} min={min} max={max} step={step}
+             onChange={(e) => onChange(Number(e.target.value))} />{unit && <span style={{fontSize:11,color:'rgba(41,38,27,.45)'}}>{unit}</span>}
+    </div>
+  );
+}
+function __twkIsLight(hex) {
+  const h = String(hex).replace('#', '');
+  const x = h.length === 3 ? h.replace(/./g, (c) => c + c) : h.padEnd(6, '0');
+  const n = parseInt(x.slice(0, 6), 16);
+  if (Number.isNaN(n)) return true;
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  return r * 299 + g * 587 + b * 114 > 148000;
+}
+const __TwkCheck = ({ light }) => (
+  <svg viewBox="0 0 14 14" aria-hidden="true">
+    <path d="M3 7.2 5.8 10 11 4.2" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" stroke={light ? 'rgba(0,0,0,.78)' : '#fff'} />
+  </svg>
+);
+function TweakColor({ label, value, options, onChange }) {
+  if (!options || !options.length) {
+    return (
+      <div className="twk-row twk-row-h">
+        <div className="twk-lbl"><span>{label}</span></div>
+        <input type="color" className="twk-swatch" value={value} onChange={(e) => onChange(e.target.value)} />
+      </div>
+    );
+  }
+  const key = (o) => String(JSON.stringify(o)).toLowerCase();
+  const cur = key(value);
+  return (
+    <TweakRow label={label}>
+      <div className="twk-chips" role="radiogroup">
+        {options.map((o, i) => {
+          const colors = Array.isArray(o) ? o : [o];
+          const [hero, ...rest] = colors;
+          const sup = rest.slice(0, 4);
+          const on = key(o) === cur;
+          return (
+            <button key={i} type="button" className="twk-chip" role="radio" aria-checked={on} data-on={on ? '1' : '0'}
+                    style={{ background: hero }} onClick={() => onChange(o)}>
+              {sup.length > 0 && <span>{sup.map((c, j) => <i key={j} style={{ background: c }} />)}</span>}
+              {on && <__TwkCheck light={__twkIsLight(hero)} />}
+            </button>
+          );
+        })}
+      </div>
+    </TweakRow>
+  );
+}
+function TweakButton({ label, onClick, secondary = false }) {
+  return <button type="button" className={secondary ? 'twk-btn secondary' : 'twk-btn'} onClick={onClick}>{label}</button>;
+}
+Object.assign(window, { useTweaks, TweaksPanel, TweakSection, TweakRow, TweakSlider, TweakToggle, TweakRadio, TweakSelect, TweakText, TweakNumber, TweakColor, TweakButton });
+</script>
+<div id="tweaks-root"></div>
+<script type="text/babel">
+  const STAGE_BG = {
+    'Jasne':  'radial-gradient(120% 90% at 50% 8%, #ffffff 0%, #eef2f8 55%, #e4eaf2 100%)',
+    'Neutralne': '#eef1f6',
+    'Ciemne': 'radial-gradient(120% 90% at 50% 8%, #1e293b 0%, #0f172a 70%, #0b1120 100%)',
+  };
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "accent": "#475569",
+    "dotScale": 1,
+    "background": "Jasne"
+  }/*EDITMODE-END*/;
+
+  function applyTweak(key, val) {
+    if (key === 'accent') window.eegApi.setAccent(val);
+    if (key === 'dotScale') window.eegApi.setDotScale(val);
+    if (key === 'background') {
+      const stage = document.querySelector('.stage');
+      stage.style.background = STAGE_BG[val] || STAGE_BG['Jasne'];
+      const dark = val === 'Ciemne';
+      document.querySelector('.hint').style.background = dark ? 'rgba(15,23,42,.6)' : 'rgba(255,255,255,.78)';
+      document.querySelector('.hint').style.color = dark ? '#cbd5e1' : '';
+      document.querySelector('.views').style.background = dark ? 'rgba(15,23,42,.55)' : 'rgba(255,255,255,.82)';
+    }
+  }
+
+  function Panel() {
+    const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+    React.useEffect(() => { Object.keys(TWEAK_DEFAULTS).forEach(k => applyTweak(k, t[k])); }, []);
+    const set = (k) => (v) => { setTweak(k, v); applyTweak(k, v); };
+    return (
+      <TweaksPanel>
+        <TweakSection label="Wygląd" />
+        <TweakColor label="Kolor akcentu" value={t.accent}
+          options={['#2563eb', '#0f9fb0', '#7c3aed', '#475569']}
+          onChange={set('accent')} />
+        <TweakSlider label="Wielkość elektrod" value={t.dotScale} min={0.7} max={1.4} step={0.05}
+          onChange={set('dotScale')} />
+        <TweakSection label="Scena" />
+        <TweakRadio label="Tło" value={t.background}
+          options={['Jasne', 'Neutralne', 'Ciemne']}
+          onChange={set('background')} />
+      </TweaksPanel>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('tweaks-root')).render(<Panel />);
+</script>
+</body>
+</html>

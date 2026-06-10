@@ -1,0 +1,83 @@
+Projekt badawczy – D. Satora-Izquierdo, kognitywistyka rok 3.
+NEURONALNE I BEHAWIORALNE KORELATY ZJAWISKA FOMO (FEAR OF MISSING OUT) – BADANIE PRZY UŻYCIU EEG.
+
+Wprowadzenie i znaczenie badania
+
+Zjawisko FOMO to reakcja emocjonalna - lęk przed pominięciem osobistego lub publicznego doświadczenia, które mogłoby pomóc jednostce utrzymać lub poprawić jej życie osobiste i społeczne (Saygın & Karadal, 2022). Zjawisko to nabiera coraz większej skali, np. USA dotyczy aż 69% młodych użytkowników mediów społecznościowych (Bartosiak i in., 2025). Stało się to powszechnym problemem kognitywnym i społecznym.
+FOMO wpływa również na zachowania konsumenckie, ponieważ algorytmy mediów społecznościowych aktywnie wykorzystują ten mechanizm jako narzędzie marketingowe napędzające kompulsywną konsumpcję (Alfina i in., 2023). FOMO rodzi jednak poważne problemy wywołując przewlekły lęk, stres oraz stany depresyjne. Kompulsywne sprawdzanie telefonu obniża koncentrację i prowadzi do chronicznych zaburzeń snu (Ellahi i in., 2021). Zjawisko to negatywnie oddziałuje również na relacje interpersonalne –  preferowanie interakcji wirtualnych kosztem kontaktu bezpośredniego osłabia więzi z bliskimi (Peleg & Boniel-Nissim, 2024).
+Dotychczasowe badania nad FOMO opierały się głównie na metodach kwestionariuszowych (Przybylski i in., 2013). Metoda EEG pozwala natomiast obiektywnie rejestrować aktywność mózgu z rozdzielczością milisekundową, umożliwiając precyzyjny pomiar reakcji neuronalnych na bodźce dźwiękowe. Badania potwierdzają, że wysokie nasilenie FOMO obniża sprawność samokontroli i mediuje kompulsywne zachowania, zmuszając do ciągłego sprawdzania telefonu (Takács & Seregély, 2025; Wang i in., 2023).
+
+Cel, pytanie badawcze i hipotezy
+
+Niniejszy projekt ma na celu zbadanie neurobiologicznych mechanizmów FOMO, aby za pomocą aparatury EEG precyzyjnie określić, które obszary mózgu i jakie wzorce fal elektrycznych aktywują się pod wpływem cyfrowych bodźców oraz lęku przed wykluczeniem społecznym.
+
+Pytanie badawcze: Jak znane dźwiękowe powiadomienia z mediów społecznościo-wych wpływają na aktywność bioelektryczną mózgu u osób o wysokim i niskim poziomie FOMO, gdy nie mają one możliwości sprawdzenia swojego telefonu?
+H1: Usłyszenie dźwięku wywoła u osób z wysokim FOMO silniejszy spadek mocy fal alfa w lewej korze czołowej w porównaniu do grupy z niskim FOMO. Jest to mierzone za pomocą EEG wskaźnikiem FFA (Frontal Alpha Asymmetry) asymetrii czołowej alfa, co oznacza wyższe pobudzenie neuronów (desynchronizacja alfa = odhamowanie aktywności korowej).
+H2: Osoby o wysokim poziomie FOMO wykażą istotnie wyższą amplitudę oraz brak habituacji fali P300 w odpowiedzi na powiadomienia telefoniczne w porównaniu do osób o niskim poziomie FOMO, u których reakcja ta będzie umiarkowana i będzie słabła przy kolejnych powtórzeniach sygnału.
+
+Metodologia
+
+Grupa badawcza (N = 40, wiek 18–25 lat) zostanie wyłoniona metodą doboru skrajnego z większej próby studentów przebadanych kwestionariuszem FoMOs (FOMO scale). Do właściwego badania EEG zakwalifikowane zostaną dwie równe podgrupy: Grupa A (20 osób z najwyższymi wynikami – wysokie FOMO) oraz Grupa B (20 osób z najniższymi wynikami – niskie FOMO).
+Aparatura i narzędzia
+64-kanałowy system EEG firmy Brain Products (czepek actiCAP slim z aktywnymi elektrodami żelowymi, wzmacniacz actiCHamp), umożliwiający zapis sygnału o wysokiej rozdzielczości przestrzennej przy impedancji poniżej 5 kΩ;
+Oprogramowanie OpenSesame do generowania bodźców dźwiękowych;
+USB Trigger Box (precyzja znaczników czasowych <1 ms) do synchronizacji z sygnałem EEG;
+Smartfon badanego
+Skala FoMO (Fear of Missing Out Scale) autorstwa Przybylskiego i współpracowników (2013) — 10-itemowy kwestionariusz samoopisowy w skali Likerta (1–5), służąca do pomiaru nasilenia lęku przed przegapieniem; stosowana jako narzędzie selekcji uczestników oraz zmienna różnicująca w analizie danych
+
+Procedura badawcza
+Przygotowanie
+Przed przystąpieniem do badania uczestnik zapoznaje się z jego celem i procedurą, a następnie podpisuje świadomą zgodę na udział. Badacz zakłada uczestnikowi 64-kanałowy czepek EEG, nakładając żel przewodzący na każdą elektrodę i weryfikując impedancję (poniżej 5 kΩ). Przed sesją ustalany jest z uczestnikiem indywidualny dźwięk powiadomienia z jego aplikacji mediów społecznościowych, czyli ten, którego używa na co dzień. Posłuży on jako bodziec kluczowy. Szacunkowy czas przygotowań: 45-60 minut
+W celu minimalizacji sztuczności warunków laboratoryjnych wykorzystywany jest własny telefon badanego z jego indywidualnym dźwiękiem powiadomienia, nagranym przed sesją. Podczas badania telefon pracuje w trybie samolotowym, eliminując zewnętrzne zakłócenia sieciowe. Dźwięk bodźca kluczowego wyzwalany jest zdalnie przez Bluetooth; ze względu na zmienność czasową transmisji Bluetooth (jitter rzędu kilkunastu ms), precyzyjna synchronizacja z zapisem EEG zapewniona jest przez USB Trigger Box, który wysyła znacznik czasowy z dokładnością poniżej 1 ms.
+Przebieg badania
+Uczestnik wykonuje zadanie ciągłego wykonania (CPT), reaguje na literę „X" pojawiającą się na ekranie, co angażuje uwagę i uniemożliwia swobodne myślenie o telefonie. W tle emitowany jest losowo jeden z trzech bodźców dźwiękowych: kluczowy (uzgodniony dźwięk powiadomienia uczestnika), neutralny (ton systemowy) lub kontrolny (dźwięk natury). Przez cały czas trwania sesji uczestnik ma zakaz dotykania smartfona. Rejestracja danych EEG trwa 20 minut.
+
+OCZEKIWANE WYNIKI I ANALIZA DANYCH
+		Sygnał EEG zostanie oczyszczony z artefaktów ruchowych (m.in. mruganie oczu, napięcie mięśniowe). Analizie podda się dwa wskaźniki: Potencjały Wywołane (ERP): Analiza amplitudy fali P300 w okolicach ciemieniowo-centralnych (elektrody Pz, Cz) w oknie czasowym 300–500 ms po emisji dźwięku. Oczekiwana wyższa amplituda dla dźwięku u osób z wysokim FOMO (silna odpowiedź orientacyjna na dystraktor). Analiza Częstotliwościowa (FT): Obliczenie gęstości widmowej mocy (PSD) dla pasma alfa (8–12 Hz) na elektrodach czołowych (F3 i F4) na podstawie współczynnika Asymetria = ln(Moc F4) - ln(Moc F3) powinno dać niższą moc alfa po lewej stronie (F3). Oznacza to wyższą aktywację tej półkuli, co zinterpretuje się jako stan gotowości do działania / frustracji wywołanej brakiem możliwości sprawdzenia telefonu.
+
+		Budżet
+
+Pozycja
+Opcja dostępu
+Koszt łączny
+System EEG 64ch + wzmacniacz + licencja
+Laboratorium SWPS Warszawa — dostęp w ramach współpracy
+0 zł
+USB Trigger Box
+Zasób laboratorium
+0 zł
+OpenSesame
+Open source
+0 zł
+Żel przewodzący ECI Electro-Gel 473 ml (3 słoiki)
+Zakup (e-majer.pl / elmiko.pl)
+300 zł
+NuPrep (preparat przygotowujący skórę)
+Zakup (e-majer.pl / elmiko.pl)
+100 zł
+Wynagrodzenie uczestników
+50 zł × 40 osób
+2 000 zł
+Sesje niewypały
+50 zł × 5 sesji
+250 zł
+Rezerwa na nieprzewidziane koszty
+—
+500 zł
+ŁĄCZNIE
+ 
+3 150 zł
+
+		Zespół badawczy – 5 osób
+		Projekt realizowany jest przez studenta kognitywistyki Uniwersytetu UMK, pełniącego rolę głównego badacza, posiadającego wiedzę z zakresu psychologii poznawczej i neuronauki, znajomość literatury dotyczącej zjawiska FOMO oraz umiejętność obsługi oprogramowania OpenSesame i podstaw rejestracji EEG. Nadzór merytoryczny sprawuje promotor – pracownik naukowo-dydaktyczny katedry psychologii lub kognitywistyki z udokumentowanym doświadczeniem w badaniach EEG/ERP oraz uprawnieniami do zatwierdzania protokołów etycznych. Wsparcie techniczne zapewnia doktorant z doświadczeniem w obsłudze wielokanałowych systemów EEG firmy Brain Products, znający procedury przygotowania uczestnika, nakładania żelu przewodzącego oraz weryfikacji impedancji elektrod oraz udostępniający Laboratorium. Analizą danych zajmuje się osoba z kompetencjami w zakresie przetwarzania sygnału EEG przy użyciu środowisk MATLAB lub Python (EEGLAB/MNE-Python), obejmującymi usuwanie artefaktów, analizę składowych niezależnych (ICA) oraz uśrednianie komponentów ERP. W projekcie uczestniczy również student odbywający staż naukowy, wspierający realizację badania na każdym jego etapie od rekrutacji uczestników po asystę podczas sesji pomiarowych.
+
+Bibliografia
+
+Alfina, Hartini, S., & Mardhiyah, D. (2023). FOMO related consumer behaviour in marketing context: A systematic literature review. Cogent Business & Management, 10(3), 2250033. https://doi.org/10.1080/23311975.2023.2250033
+Bartosiak, A., Lee, J. E., & Loibl, C. (2025). Fear of missing out, social media influencers, and the social, psychological and financial wellbeing of young consumers. PLOS ONE, 20(4), e0319034. https://doi.org/10.1371/journal.pone.0319034
+Ellahi, A., Javed, Y., Begum, S., Mushtaq, R., Rehman, M., & Rehman, H. M. (2021). Bedtime Smart Phone Usage and Its Effects on Work-Related Behaviour at Workplace. Frontiers in Psychology, 12, 698413. https://doi.org/10.3389/fpsyg.2021.698413
+Peleg, O., & Boniel-Nissim, M. (2024). Exploring the personality and relationship factors that mediate the connection between differentiation of self and phubbing. Scientific Reports, 14(1), 6572. https://doi.org/10.1038/s41598-024-55560-1
+Przybylski, A. K., Murayama, K., DeHaan, C. R., & Gladwell, V. (2013). Motivational, emotional, and behavioral correlates of fear of missing out. Computers in Human Behavior, 29(4), 1841–1848. https://doi.org/10.1016/j.chb.2013.02.014
+Saygın, M., & Karadal, H. (2022). The Fear of Missing Out (FoMO): Theoretical Approach and Measurement in Organizations. W F. Özsungur (Red.), Advances in Human and Social Aspects of Technology (s. 631–651). IGI Global. https://doi.org/10.4018/978-1-7998-9187-1.ch028
+Takács, J., & Seregély, B. (2025). Parallel mediation of FoMO and self-control on the relationship between problematic smartphone use and neuroticism, at-risk group’s characteristics among young adults. Acta Psychologica, 260, 105608. https://doi.org/10.1016/j.actpsy.2025.105608
+Wang, L., Zhou, X., Song, X., Gan, X., Zhang, R., Liu, X., Xu, T., Jiao, G., Ferraro, S., Bore, M. C., Yu, F., Zhao, W., Montag, C., & Becker, B. (2023). Fear of missing out (FOMO) associates with reduced cortical thickness in core regions of the posterior default mode network and higher levels of problematic smartphone and social media use. Addictive Behaviors, 143, 107709. https://doi.org/10.1016/j.addbeh.2023.107709

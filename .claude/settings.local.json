@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pandoc \"C:\\\\Users\\\\sator\\\\Documents\\\\UMK\\\\Kogni LAB\\\\raport\\\\07-glossary\\\\Satora_08_Glossary.docx\" -o - --to plain)",
+      "Bash(pandoc \"C:\\\\Users\\\\sator\\\\Documents\\\\UMK\\\\Kogni LAB\\\\raport\\\\06-zespol\\\\Satora_06-07_Zespol_Harmonogram.docx\" -o - --to plain)",
+      "Bash(pandoc \"C:\\\\Users\\\\sator\\\\Documents\\\\UMK\\\\Kogni LAB\\\\raport\\\\09-tworzenie-raportu\\\\powstanie raportu.docx\" -o - --to plain)",
+      "PowerShell(pandoc \"C:\\\\Users\\\\sator\\\\Documents\\\\UMK\\\\Kogni LAB\\\\raport\\\\07-glossary\\\\Satora_08_Glossary.docx\" --to plain)",
+      "PowerShell(pandoc \"C:\\\\Users\\\\sator\\\\Documents\\\\UMK\\\\Kogni LAB\\\\raport\\\\06-zespol\\\\Satora_06-07_Zespol_Harmonogram.docx\" --to plain)",
+      "PowerShell(pandoc \"C:\\\\Users\\\\sator\\\\Documents\\\\UMK\\\\Kogni LAB\\\\raport\\\\09-tworzenie-raportu\\\\powstanie raportu.docx\" --to plain)",
+      "Bash(find / -maxdepth 6 -type d -name \"rapot\" 2>/dev/null | head -10)",
+      "PowerShell(Get-ChildItem -Path \"$env:USERPROFILE\\\\rapot\" -Recurse -Depth 3 | Select-Object FullName, PSIsContainer | Format-Table -AutoSize)",
+      "PowerShell($f = \"C:\\\\Users\\\\sator\\\\Documents\\\\UMK\\\\Kogni LAB\\\\raport\\\\raport kogniLAB\\\\index.html\"; \\(Get-Item $f\\).Length/1KB | ForEach-Object { \"{0:N1} KB\" -f $_ })",
+      "Bash(python3 -c ' *)",
+      "Bash(git init *)",
+      "Bash(git config *)",
+      "Bash(git add *)"
+    ]
+  }
+}
