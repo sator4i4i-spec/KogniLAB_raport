@@ -288,7 +288,7 @@
     ton:           { High: [4.2, 3.8, 3.4],    Low: [4.0, 3.7, 3.3] },
     natura:        { High: [3.1, 3.0, 2.9],    Low: [3.0, 2.9, 2.8] },
   };
-  const CHANNEL_SCALE = { Pz: 1.0, Cz: 0.86 };
+  const CHANNEL_SCALE = { Pz: 1.0, Fz: 0.62, F3: 0.54, Cz: 0.86 };
   const GROUP_SD = { High: 3.0, Low: 2.7 };
   function p300Amp(stimulus, group, block, channel) { return P300_AMP[stimulus][group][block - 1] * CHANNEL_SCALE[channel]; }
   function sample(t, p300, seed) {
@@ -308,7 +308,7 @@
   }
   function curve(stimulus, group, block, channel) {
     const p300 = p300Amp(stimulus, group, block, channel);
-    const seed = (group === 'High' ? 3 : 11) + block * 5 + (channel === 'Pz' ? 0 : 23)
+    const seed = (group === 'High' ? 3 : 11) + block * 5 + ({ Pz: 0, Cz: 23, Fz: 41, F3: 57 }[channel] || 0)
                + ({ powiadomienie: 0, ton: 50, natura: 100 })[stimulus];
     const out = [];
     for (let t = T_MIN; t <= T_MAX; t += DT) out.push({ t, v: sample(t, p300, seed), sem: semAt(t, p300, seed) });
@@ -699,19 +699,28 @@ Object.assign(window, { useTweaks, TweaksPanel, TweakSection, TweakRow, TweakSli
     const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
     const [stimulus, setStimulus] = useState('powiadomienie');
     const [block, setBlock] = useState(1);
-    const [channel, setChannel] = useState('Pz');
+    const [measure, setMeasure] = useState('p300');
+    const MEASURE_CHANNELS = {
+      p300: [{ id: 'Pz', label: 'Pz', sub: 'główny P300' }, { id: 'Fz', label: 'Fz', sub: 'wspólny / ref.' }],
+      alpha: [{ id: 'F3', label: 'F3', sub: 'alfa lewo' },  { id: 'Fz', label: 'Fz', sub: 'wspólny / ref.' }],
+    };
+    const [channel, setChannelRaw] = useState('Pz');
+    const setChannel = (ch) => setChannelRaw(ch);
+    // keep channel valid when measure switches
+    const validChannels = MEASURE_CHANNELS[measure].map(o => o.id);
+    const effectiveChannel = validChannels.includes(channel) ? channel : validChannels[0];
     const [win, setWin] = useState({ a: 300, b: 500 });
     const colors = PALETTES[t.palette] || PALETTES['Crimson / Blue'];
 
     const stats = useMemo(() => {
-      const cHigh = window.ERP.curve(stimulus,'High',block,channel);
-      const cLow  = window.ERP.curve(stimulus,'Low',block,channel);
+      const cHigh = window.ERP.curve(stimulus,'High',block,effectiveChannel);
+      const cLow  = window.ERP.curve(stimulus,'Low',block,effectiveChannel);
       const mH = window.ERP.windowMean(cHigh,win.a,win.b);
       const mL = window.ERP.windowMean(cLow,win.a,win.b);
       const diff = mH - mL;
       const d = window.ERP.cohensD(mH,mL);
       return { mH, mL, diff, d, label: window.ERP.effectLabel(d) };
-    }, [stimulus, block, channel, win.a, win.b]);
+    }, [stimulus, block, effectiveChannel, win.a, win.b]);
 
     const isP300win = win.a>=280 && win.b<=520 && (win.b-win.a)>=120;
 
@@ -726,7 +735,8 @@ Object.assign(window, { useTweaks, TweaksPanel, TweakSection, TweakRow, TweakSli
             Przeciągnij zacienione okno pomiarowe, aby wyznaczyć średnią amplitudę w dowolnym przedziale.
           </p>
           <div className="meta">
-            <span><i>Kanał</i>{channel}</span>
+            <span><i>Kanał</i>{effectiveChannel}</span>
+            <span><i>Miara</i>{measure === 'p300' ? 'P300' : 'Alpha (FAA)'}</span>
             <span><i>Okno</i>300–500 ms</span>
             <span><i>Próba</i>N = 40 (2×20)</span>
             <span><i>Bodziec</i>{STIM.find(s=>s.id===stimulus).label}</span>
@@ -736,8 +746,10 @@ Object.assign(window, { useTweaks, TweaksPanel, TweakSection, TweakRow, TweakSli
             <Segmented label="Bodziec" value={stimulus} onChange={setStimulus} options={STIM.map(s=>({id:s.id,label:s.label,sub:s.sub}))} />
             <Segmented label="Blok · habituacja" value={block} onChange={setBlock}
               options={[{id:1,label:'Blok 1'},{id:2,label:'Blok 2'},{id:3,label:'Blok 3'}]} />
-            <Segmented label="Elektroda" value={channel} onChange={setChannel}
-              options={[{id:'Pz',label:'Pz'},{id:'Cz',label:'Cz'}]} />
+            <Segmented label="Miara" value={measure} onChange={(m) => { setMeasure(m); setChannelRaw(MEASURE_CHANNELS[m][0].id); }}
+              options={[{id:'p300',label:'P300',sub:'Pz · Fz'},{id:'alpha',label:'Alpha (FAA)',sub:'F3 · Fz'}]} />
+            <Segmented label="Elektroda" value={effectiveChannel} onChange={setChannel}
+              options={MEASURE_CHANNELS[measure]} />
           </div>
 
           <div className="legend">
@@ -750,7 +762,7 @@ Object.assign(window, { useTweaks, TweaksPanel, TweakSection, TweakRow, TweakSli
           <div className="chart-wrap">
             <div className="y-axis-label">Amplituda (μV){t.convention==='neg'?' · − w górę':''}</div>
             <div className="chart-inner">
-              <ERPChart stimulus={stimulus} block={block} channel={channel}
+              <ERPChart stimulus={stimulus} block={block} channel={effectiveChannel}
                 win={win} onWindowChange={setWin} colors={colors} showSEM={t.showSEM} convention={t.convention} height={460} />
               <div className="x-axis-label">Czas od emisji bodźca (ms) — 0 ms = bodziec</div>
             </div>
