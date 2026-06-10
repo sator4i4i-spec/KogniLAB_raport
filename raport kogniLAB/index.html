@@ -551,6 +551,23 @@ footer{background:var(--navy-2);border-top:1px solid var(--line-d)}
       </div>
     </div>
 
+    <!-- Expandable methodology detail -->
+    <div style="margin-top:28px;border:1px solid rgba(255,205,0,.18);border-radius:12px;overflow:hidden">
+      <button onclick="(function(btn){var c=btn.nextElementSibling;var open=c.style.maxHeight&&c.style.maxHeight!=='0px';c.style.maxHeight=open?'0px':c.scrollHeight+'px';c.style.opacity=open?'0':'1';btn.querySelector('.expand-arrow').style.transform=open?'rotate(0deg)':'rotate(180deg)'})(this)"
+        style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 18px;background:rgba(255,205,0,.05);border:none;cursor:pointer;text-align:left;font-family:var(--sans);color:var(--txt-d);font-size:13.5px;font-weight:600">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <span class="lang-pl">Szczegółowy opis przebiegu badania</span>
+        <span class="lang-en">Detailed study procedure</span>
+        <svg class="expand-arrow" viewBox="0 0 24 24" fill="none" stroke="var(--txt-d-soft)" stroke-width="2" width="14" height="14" style="margin-left:auto;transition:transform .25s"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div style="max-height:0;opacity:0;overflow:hidden;transition:max-height .35s ease, opacity .25s ease">
+        <p style="margin:0;padding:18px 20px;font-size:14px;line-height:1.75;color:var(--txt-d-soft);font-family:var(--sans)">
+          W badaniu EEG wezmą udział osoby o zróżnicowanym poziomie FOMO, którym na czas testu zostaną odebrane smartfony. Podczas generowania losowych dźwięków powiadomień, uczestnicy będą wykonywać zadanie CPT oparte na paradygmacie Go/No-Go.<br><br>
+          Ciągły spadek mocy fal alfa w lewej korze czołowej posłuży jako miara frustracji, napięcia oraz wewnętrznego głodu (cravingu), wynikającego z aktywacji systemu motywacji do dążenia (approach system). Równolegle monitorowany komponent P300 (w tym No-Go P3) pozwoli ocenić, ile wysiłku poznawczego mózg wkłada w hamowanie reakcji i powstrzymywanie się przed sięgnięciem po telefon. Dodatkowo u osób z wysokim FOMO przewiduje się brak habituacji (spadku amplitudy) P300 na dźwięki powiadomień, co wykaże permanentne, wyczerpujące odciąganie zasobów uwagi od zadania głównego.
+        </p>
+      </div>
+    </div>
+
     <!-- Interactive EEG Cap embed -->
     <div class="embed-box" style="margin-top:36px">
       <div class="embed-box__label">
