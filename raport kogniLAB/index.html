@@ -552,6 +552,36 @@ footer{background:var(--navy-2);border-top:1px solid var(--line-d)}
       </div>
     </div>
 
+    <!-- Elektrody diagram -->
+    <div style="margin-top:32px;display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:start">
+      <div>
+        <p style="font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-d-soft);margin:0 0 12px">
+          <span class="lang-pl">Elektrody badania</span><span class="lang-en">Study electrodes</span>
+        </p>
+        <img src="elektrody.jpg" alt="Układ elektrod w badaniu — czerwone: alfa (FAA), niebieskie: P300"
+          style="width:260px;border-radius:10px;border:1px solid rgba(255,255,255,.08);box-shadow:0 6px 24px rgba(0,0,0,.4)"/>
+      </div>
+      <div style="padding-top:30px">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--txt-d-soft)">
+            <span style="display:inline-block;width:14px;height:14px;border-radius:50%;border:2.5px solid #e03a3a;flex-shrink:0"></span>
+            <span><b style="color:#e03a3a;font-family:var(--mono)">F3, FC3, Fz, FCz, F4, FC4</b> — asymetria alfa czołowa (FAA)</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--txt-d-soft)">
+            <span style="display:inline-block;width:14px;height:14px;border-radius:50%;border:2.5px solid #2563eb;flex-shrink:0"></span>
+            <span><b style="color:#2563eb;font-family:var(--mono)">Fz, Cz, Pz</b> — komponent P300 (ERP)</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--txt-d-soft)">
+            <span style="display:inline-block;width:14px;height:14px;border-radius:50%;border:2.5px solid #8b5cf6;flex-shrink:0"></span>
+            <span><b style="color:#8b5cf6;font-family:var(--mono)">Fz</b> — elektroda wspólna (alfa + P300)</span>
+          </div>
+        </div>
+        <p style="font-size:12.5px;line-height:1.65;color:var(--txt-d-soft);margin-top:16px;font-family:var(--mono)">
+          Kliknij elektrodę na interaktywnym modelu czepka poniżej, aby zobaczyć szczegóły anatomiczne.
+        </p>
+      </div>
+    </div>
+
     <!-- Expandable methodology detail -->
     <div style="margin-top:28px;border:1px solid rgba(255,205,0,.18);border-radius:12px;overflow:hidden">
       <button onclick="(function(btn){var c=btn.nextElementSibling;var open=c.style.maxHeight&&c.style.maxHeight!=='0px';c.style.maxHeight=open?'0px':c.scrollHeight+'px';c.style.opacity=open?'0':'1';btn.querySelector('.expand-arrow').style.transform=open?'rotate(0deg)':'rotate(180deg)'})(this)"
