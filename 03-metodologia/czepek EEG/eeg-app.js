@@ -225,6 +225,19 @@
         ctx.stroke();
       }
 
+      // halo elektrod badania
+      const study = EEG_STUDY[e.name];
+      if (study && !dim) {
+        const pulse = 0.5 + 0.5 * Math.sin(t / 600 + (e.Lsigned || 0));
+        const hr = rad + 7 + pulse * 4;
+        const sc = STUDY_COLORS[study.role];
+        ctx.beginPath();
+        ctx.arc(sx, sy, hr, 0, Math.PI * 2);
+        ctx.strokeStyle = hexA(sc, (0.7 - 0.3 * pulse) * (back ? 0.35 : 1));
+        ctx.lineWidth = 2.8;
+        ctx.stroke();
+      }
+
       // pierścień zewnętrzny / cień
       ctx.beginPath();
       ctx.arc(sx, sy, rad + 1.6, 0, Math.PI * 2);
@@ -232,7 +245,8 @@
       ctx.fill();
 
       // korpus elektrody
-      const fill = dim ? '#9aa6b5' : reg.color;
+      const studyFill = study ? STUDY_COLORS[study.role] : null;
+      const fill = dim ? '#9aa6b5' : (studyFill || reg.color);
       ctx.beginPath();
       ctx.arc(sx, sy, rad, 0, Math.PI * 2);
       ctx.fillStyle = hexA(fill, alpha);
@@ -253,7 +267,8 @@
       }
 
       // etykiety
-      const showLab = (state.showLabels || sel || hov || (e.analytical && state.showAnalytical)) && !back && !(dim && !sel && !hov);
+      const isStudy = !!EEG_STUDY[e.name];
+      const showLab = (state.showLabels || sel || hov || (e.analytical && state.showAnalytical) || isStudy) && !back && !(dim && !sel && !hov);
       if (showLab) {
         ctx.font = `600 ${Math.max(9, rad * 1.05)}px "IBM Plex Mono", monospace`;
         ctx.textAlign = 'center';
@@ -378,7 +393,10 @@
           <div class="quick">
             <span class="quick-lbl">Elektrody analityczne</span>
             <div class="quick-chips">
-              ${['Pz','Cz','F3','F4'].map(n => `<button class="chip-an" onclick="eegSelect('${n}')">${n}</button>`).join('')}
+              ${Object.keys(EEG_STUDY).map(n => {
+                const c = STUDY_COLORS[EEG_STUDY[n].role];
+                return `<button class="chip-an" onclick="eegSelect('${n}')" style="color:${c};background:${c}18;border-color:${c}55">${n}</button>`;
+              }).join('')}
             </div>
           </div>
         </div>`;
@@ -399,6 +417,14 @@
         <p>${reg.fn}</p>
       </div>
       ${e.note ? `<div class="d-block d-note"><span class="d-lbl">Znaczenie analityczne</span><p>${e.note}</p></div>` : ''}
+      ${EEG_STUDY[e.name] ? (() => {
+        const s = EEG_STUDY[e.name];
+        const c = STUDY_COLORS[s.role];
+        return `<div class="d-block d-note" style="background:${hexA(c,0.07)};border-color:${hexA(c,0.35)};border-left:3px solid ${c}">
+          <span class="d-lbl" style="color:${c}">${s.label}</span>
+          <p>${s.note}</p>
+        </div>`;
+      })() : ''}
       <div class="d-meta">
         <div><span>Rząd</span><b>${e.row}</b></div>
         <div><span>Układ</span><b>10-10</b></div>

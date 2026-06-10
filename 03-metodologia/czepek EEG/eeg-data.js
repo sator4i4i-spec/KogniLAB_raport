@@ -119,3 +119,24 @@ function buildEdges(electrodes) {
 
 const EEG_ELECTRODES = buildElectrodes();
 const EEG_EDGES = buildEdges(EEG_ELECTRODES);
+
+/* Elektrody kluczowe dla badania FOMO+EEG */
+const STUDY_COLORS = { alpha: '#e03a3a', p300: '#2563eb', both: '#8b5cf6' };
+const EEG_STUDY = {
+  'F3':  { role: 'alpha', label: 'FAA · alfa lewostronny',
+    note: 'Lewa grzbietowo-boczna kora przedczołowa (dlPFC), odpowiada za system motywacji dążenia do celu, zaangażowania. Wiąże się ze złością i frustracją gdy cel jest blokowany.' },
+  'FC3': { role: 'alpha', label: 'FAA · alfa lewostronny',
+    note: 'Lewa grzbietowo-boczna kora przedczołowa (dlPFC), odpowiada za system motywacji dążenia do celu, zaangażowania. Wiąże się ze złością i frustracją gdy cel jest blokowany.' },
+  'Fz':  { role: 'both',  label: 'FAA odniesienie + P300',
+    note: 'Przyśrodkowa kora przedczołowa (mPFC) oraz dodatkowa kora ruchowa (SMA), centrum kontroli poznawczej, planowania i hamowania impulsów. Punkt odniesienia dla fali alfa. Miejsce sygnału hamującego dla P300.' },
+  'FCz': { role: 'alpha', label: 'FAA · alfa środkowy',
+    note: 'Przyśrodkowa kora przedczołowa (mPFC) oraz dodatkowa kora ruchowa (SMA), centrum kontroli poznawczej, planowania i hamowania impulsów. Punkt odniesienia dla fali alfa. Miejsce sygnału hamującego dla P300.' },
+  'F4':  { role: 'alpha', label: 'FAA · alfa prawostronny',
+    note: 'Prawa grzbietowo-boczna kora przedczołowa, odpowiada za system wycofania i unikania (wiąże się z lękiem i niepokojem).' },
+  'FC4': { role: 'alpha', label: 'FAA · alfa prawostronny',
+    note: 'Prawa grzbietowo-boczna kora przedczołowa, odpowiada za system wycofania i unikania (wiąże się z lękiem i niepokojem).' },
+  'Cz':  { role: 'p300',  label: 'P300',
+    note: 'Kora czuciowo-ruchowa (zakręt przedśrodkowy i zaśrodkowy — fizyczne wykonywanie ruchów) oraz głęboko położona przednia kora zakrętu obręczy (ACC — wykrywanie konfliktów).' },
+  'Pz':  { role: 'p300',  label: 'P300 · główny punkt rejestracji',
+    note: 'Przyśrodkowa kora ciemieniowa (skojarzeniowa). Nadawanie bodźcom znaczenia, orientacja przestrzenna i alokacja zasobów uwagi.' },
+};
