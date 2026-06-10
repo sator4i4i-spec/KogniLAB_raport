@@ -24,12 +24,12 @@ const EEG_ROWS = [
 const EEG_REGIONS = {
   frontal:   { id: 'frontal',   label: 'Płat czołowy',      color: '#3b6fd4',
     fn: 'Funkcje wykonawcze, planowanie, pamięć robocza, uwaga oraz kontrola ruchu i mowy (okolica Broki po lewej).' },
+  parietal:  { id: 'parietal',  label: 'Płat ciemieniowy',  color: '#2da56c',
+    fn: 'Integracja czuciowa, percepcja przestrzenna, uwaga oraz koordynacja wzrokowo-ruchowa.' },
   central:   { id: 'central',   label: 'Okolica centralna', color: '#0f9fb0',
     fn: 'Kora ruchowa i czuciowa wzdłuż bruzdy środkowej; planowanie i wykonanie ruchu, rytm sensomotoryczny (mu).' },
   temporal:  { id: 'temporal',  label: 'Płat skroniowy',    color: '#e0892f',
     fn: 'Słuch i przetwarzanie mowy (okolica Wernickego), pamięć, rozpoznawanie obiektów oraz przetwarzanie emocji.' },
-  parietal:  { id: 'parietal',  label: 'Płat ciemieniowy',  color: '#2da56c',
-    fn: 'Integracja czuciowa, percepcja przestrzenna, uwaga oraz koordynacja wzrokowo-ruchowa.' },
   occipital: { id: 'occipital', label: 'Płat potyliczny',   color: '#8466c9',
     fn: 'Przetwarzanie wzrokowe — analiza kształtu, koloru, ruchu i orientacji bodźców.' },
 };
