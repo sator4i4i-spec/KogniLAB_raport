@@ -47,9 +47,9 @@ const TEMPORAL_OVERRIDE = new Set(['T7','T8','FT7','FT8','TP7','TP8','P7','P8'])
 
 function regionOf(row, name) {
   if (TEMPORAL_OVERRIDE.has(name)) return 'temporal';
-  if (row === 'Fp' || row === 'AF' || row === 'F') return 'frontal';
-  if (row === 'FC' || row === 'C'  || row === 'CP') return 'central';
-  if (row === 'P') return 'parietal';
+  if (row === 'Fp' || row === 'AF' || row === 'F' || row === 'FC') return 'frontal';
+  if (row === 'C') return 'central';
+  if (row === 'CP' || row === 'P') return 'parietal';
   return 'occipital'; // PO, O
 }
 
