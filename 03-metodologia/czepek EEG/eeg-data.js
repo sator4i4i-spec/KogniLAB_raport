@@ -87,6 +87,21 @@ function buildElectrodes() {
       });
     });
   }
+  // Dodatkowe 3 elektrody do 64 kanałów (Brain Products actiCAP 64):
+  // TP9 i TP10 — okolice wyrostka sutkowatego (mastoid), poniżej TP7/TP8
+  // Iz — potyliczna (inion), poniżej Oz
+  const extra = [
+    { name: 'TP9',  row: 'CP', rowIndex: 5, n: 9,  side: 'left',  Lsigned: -90, a: -30,
+      vec: { x: -0.82, y: -0.40, z: -0.41 }, region: 'temporal',
+      analytical: false, note: null },
+    { name: 'TP10', row: 'CP', rowIndex: 5, n: 10, side: 'right', Lsigned:  90, a: -30,
+      vec: { x:  0.82, y: -0.40, z: -0.41 }, region: 'temporal',
+      analytical: false, note: null },
+    { name: 'Iz',   row: 'O',  rowIndex: 8, n: 'z', side: 'mid',  Lsigned:   0, a: -90,
+      vec: { x:  0,    y: -0.98, z: -0.20 }, region: 'occipital',
+      analytical: false, note: null },
+  ];
+  extra.forEach(e => list.push(e));
   return list;
 }
 
